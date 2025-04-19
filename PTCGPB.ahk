@@ -6,8 +6,8 @@ version = Arturos PTCGP Bot
 CoordMode, Mouse, Screen
 SetTitleMatchMode, 3
 
-githubUser := "Arturo-1212"
-repoName := "PTCGPB"
+githubUser := "joshptcgp"
+repoName := "PTCGPB-Extra"
 localVersion := "v6.3.29"
 scriptFolder := A_ScriptDir
 zipPath := A_Temp . "\update.zip"
@@ -108,18 +108,6 @@ IniRead, minStarsA2b, Settings.ini, UserSettings, minStarsA2b, 0
 
 IniRead, heartBeatDelay, Settings.ini, UserSettings, heartBeatDelay, 30
 IniRead, sendAccountXml, Settings.ini, UserSettings, sendAccountXml, 0
-
-IniRead, s4tEnabled, Settings.ini, UserSettings, s4tEnabled, 0
-IniRead, s4tSilent, Settings.ini, UserSettings, s4tSilent, 1
-IniRead, s4t3Dmnd, Settings.ini, UserSettings, s4t3Dmnd, 0
-IniRead, s4t4Dmnd, Settings.ini, UserSettings, s4t4Dmnd, 0
-IniRead, s4t1Star, Settings.ini, UserSettings, s4t1Star, 0
-IniRead, s4tGholdengo, Settings.ini, UserSettings, s4tGholdengo, 0
-IniRead, s4tWP, Settings.ini, UserSettings, s4tWP, 0
-IniRead, s4tWPMinCards, Settings.ini, UserSettings, s4tWPMinCards, 1
-IniRead, s4tDiscordWebhookURL, Settings.ini, UserSettings, s4tDiscordWebhookURL
-IniRead, s4tDiscordUserId, Settings.ini, UserSettings, s4tDiscordUserId
-IniRead, s4tSendAccountXml, Settings.ini, UserSettings, s4tSendAccountXml, 1
 
 ; Create a stylish GUI with custom colors and modern look
 Gui, Color, 1E1E1E, 333333 ; Dark theme background
@@ -240,7 +228,7 @@ Gui, Add, Checkbox, % (autoLaunchMonitor ? "Checked" : "") " vautoLaunchMonitor 
 ; ========== Pack Selection Section ==========
 sectionColor := "cFFD700" ; Gold
 Gui, Add, GroupBox, x255 y0 w240 h130 %sectionColor%, Pack Selection
-Gui, Add, Checkbox, % (Shining ? "Checked" : "") " vShining gShiningToggled x270 y25 " . sectionColor, Shining
+Gui, Add, Checkbox, % (Shining ? "Checked" : "") " vShining x270 y25 " . sectionColor, Shining
 Gui, Add, Checkbox, % (Arceus ? "Checked" : "") " vArceus x270 y45 " . sectionColor, Arceus
 Gui, Add, Checkbox, % (Palkia ? "Checked" : "") " vPalkia x270 y65 " . sectionColor, Palkia
 Gui, Add, Checkbox, % (Dialga ? "Checked" : "") " vDialga x270 y85 " . sectionColor, Dialga
@@ -283,41 +271,25 @@ if (deleteMethod = "5 Pack")
     defaultDelete := 1
 else if (deleteMethod = "3 Pack")
     defaultDelete := 2
-else if (deleteMethod = "Inject")
-    defaultDelete := 3
 else if (deleteMethod = "5 Pack (Fast)")
+    defaultDelete := 3
+else if (deleteMethod = "13 Pack")
     defaultDelete := 4
 ;    SquallTCGP 2025.03.12 -     Adding the delete method 5 Pack (Fast) to the delete method dropdown list.
-Gui, Add, DropDownList, vdeleteMethod gdeleteSettings choose%defaultDelete% x575 y48 w100 Background2A2A2A cWhite, 5 Pack|3 Pack|Inject|5 Pack (Fast)
+Gui, Add, DropDownList, vdeleteMethod gdeleteSettings choose%defaultDelete% x575 y48 w100 Background2A2A2A cWhite, 5 Pack|3 Pack|Inject|5 Pack (Fast)|13 Pack
 Gui, Add, Checkbox, % (packMethod ? "Checked" : "") " vpackMethod x520 y80 " . sectionColor, 1 Pack Method
 Gui, Add, Checkbox, % (nukeAccount ? "Checked" : "") " vnukeAccount x520 y100 " . sectionColor, Menu Delete Account
 
 ; ========== Save For Trade Settings Section ==========
 sectionColor := "cFFA500" ; Orange
 Gui, Add, GroupBox, x505 y130 w240 h175 %sectionColor%, Save For Trade Settings
-Gui, Add, Checkbox, % "vs4tEnabled gs4tSettings x520 y155 " . (s4tEnabled ? "Checked " : "") . sectionColor, Enable S4T
-Gui, Add, Checkbox, % "vs4tSilent x+5 " . (!s4tEnabled ? "Hidden " : "") . (s4tSilent ? "Checked " : "") . sectionColor, Silent (No Ping)
-
-Gui, Add, Checkbox, % "vs4t3Dmnd x520 y+5 " . (!s4tEnabled ? "Hidden " : "") . (s4t3Dmnd ? "Checked " : "") . sectionColor, 3 ◆◆◆
-Gui, Add, Checkbox, % "vs4t4Dmnd y+5 " . (!s4tEnabled ? "Hidden " : "") . (s4t4Dmnd ? "Checked " : "") . sectionColor, 4 ◆◆◆◆
-Gui, Add, Checkbox, % "vs4t1Star y+5 " . (!s4tEnabled ? "Hidden " : "") . (s4t1Star ? "Checked " : "") . sectionColor, 1 ★
-
-Gui, Add, Checkbox, % ((!s4tEnabled || !Shining) ? "Hidden " : "") . "vs4tGholdengo x+95 " . (s4tGholdengo ? "Checked " : "") . sectionColor, % "→"
-Gui, Add, Picture, % ((!s4tEnabled || !Shining) ? "Hidden " : "") . "vs4tGholdengoEmblem w35 h-1 x695 y215", % A_ScriptDir . "\Scripts\Scale125\GholdengoEmblem.png"
-
-Gui, Add, Text, x520 y255 w210 h2 +0x10 ; Creates a horizontal line
-
-Gui, Add, Checkbox, % "vs4tWP gs4tWPSettings y+10 " . (!s4tEnabled ? "Hidden " : "") . (s4tWP ? "Checked " : "") . sectionColor, Wonder Pick
-
-Gui, Add, Text, % "vs4tWPMinCardsLabel x+9 " . (!s4tEnabled || !s4tWP ? "Hidden " : "") . sectionColor, Min. Cards:
-Gui, Add, Edit, % "vs4tWPMinCards w25 x+7 h20 -E0x200 Background2A2A2A cWhite Center " . (!s4tEnabled || !s4tWP ? "Hidden" : ""), %s4tWPMinCards%
 
 
 
 ; ============ Tabs ============
 ; ==============================
 sectionColor := "cWhite"
-Gui, Add, Tab3, x255 y315 w490 h200, Download Settings|GP Discord|Heartbeat Discord|S4T Discord
+Gui, Add, Tab3, x255 y315 w490 h200, Download Settings|GP Discord|Heartbeat Discord|Removed
 
 ; Download Settings
 Gui, Tab, 1
@@ -428,63 +400,6 @@ discordSettings:
         GuiControl, Hide, hbName
         GuiControl, Hide, hbURL
         GuiControl, Hide, hbDelay
-    }
-return
-
-s4tSettings:
-    Gui, Submit, NoHide
-
-    if (s4tEnabled) {
-        GuiControl, Show, s4tSilent
-        GuiControl, Show, s4t3Dmnd
-        GuiControl, Show, s4t4Dmnd
-        GuiControl, Show, s4t1Star
-
-        if (Shining) {
-            GuiControl, Show, s4tGholdengo
-            GuiControl, Show, s4tGholdengoEmblem
-        }
-
-        GuiControl, Show, s4tWP
-
-        if (s4tWP) {
-            GuiControl, Show, s4tWPMinCardsLabel
-            GuiControl, Show, s4tWPMinCards
-        }
-    } else {
-        GuiControl, Hide, s4tSilent
-        GuiControl, Hide, s4t3Dmnd
-        GuiControl, Hide, s4t4Dmnd
-        GuiControl, Hide, s4t1Star
-        GuiControl, Hide, s4tGholdengo
-        GuiControl, Hide, s4tGholdengoEmblem
-        GuiControl, Hide, s4tWP
-        GuiControl, Hide, s4tWPMinCardsLabel
-        GuiControl, Hide, s4tWPMinCards
-    }
-return
-
-s4tWPSettings:
-    Gui, Submit, NoHide
-
-    if (s4tWP) {
-        GuiControl, Show, s4tWPMinCardsLabel
-        GuiControl, Show, s4tWPMinCards
-    } else {
-        GuiControl, Hide, s4tWPMinCardsLabel
-        GuiControl, Hide, s4tWPMinCards
-    }
-return
-
-ShiningToggled:
-    Gui, Submit, NoHide
-
-    if (Shining && s4tEnabled) {
-        GuiControl, Show, s4tGholdengo
-        GuiControl, Show, s4tGholdengoEmblem
-    } else {
-        GuiControl, Hide, s4tGholdengo
-        GuiControl, Hide, s4tGholdengoEmblem
     }
 return
 
@@ -629,18 +544,6 @@ SaveReload:
     IniWrite, %heartBeatDelay%, Settings.ini, UserSettings, heartBeatDelay
     IniWrite, %sendAccountXml%, Settings.ini, UserSettings, sendAccountXml
 
-    IniWrite, %s4tEnabled%, Settings.ini, UserSettings, s4tEnabled
-    IniWrite, %s4tSilent%, Settings.ini, UserSettings, s4tSilent
-    IniWrite, %s4t3Dmnd%, Settings.ini, UserSettings, s4t3Dmnd
-    IniWrite, %s4t4Dmnd%, Settings.ini, UserSettings, s4t4Dmnd
-    IniWrite, %s4t1Star%, Settings.ini, UserSettings, s4t1Star
-    IniWrite, %s4tWP%, Settings.ini, UserSettings, s4tWP
-    IniWrite, %s4tWPMinCards%, Settings.ini, UserSettings, s4tWPMinCards
-    IniWrite, %s4tDiscordUserId%, Settings.ini, UserSettings, s4tDiscordUserId
-    IniWrite, %s4tDiscordWebhookURL%, Settings.ini, UserSettings, s4tDiscordWebhookURL
-    IniWrite, %s4tSendAccountXML%, Settings.ini, UserSettings, s4tSendAccountXML
-    IniWrite, %s4tGholdengo%, Settings.ini, UserSettings, s4tGholdengo
-
     Reload
 return
 
@@ -720,18 +623,6 @@ Start:
 
     IniWrite, %heartBeatDelay%, Settings.ini, UserSettings, heartBeatDelay
     IniWrite, %sendAccountXml%, Settings.ini, UserSettings, sendAccountXml
-
-    IniWrite, %s4tEnabled%, Settings.ini, UserSettings, s4tEnabled
-    IniWrite, %s4tSilent%, Settings.ini, UserSettings, s4tSilent
-    IniWrite, %s4t3Dmnd%, Settings.ini, UserSettings, s4t3Dmnd
-    IniWrite, %s4t4Dmnd%, Settings.ini, UserSettings, s4t4Dmnd
-    IniWrite, %s4t1Star%, Settings.ini, UserSettings, s4t1Star
-    IniWrite, %s4tWP%, Settings.ini, UserSettings, s4tWP
-    IniWrite, %s4tWPMinCards%, Settings.ini, UserSettings, s4tWPMinCards
-    IniWrite, %s4tDiscordUserId%, Settings.ini, UserSettings, s4tDiscordUserId
-    IniWrite, %s4tDiscordWebhookURL%, Settings.ini, UserSettings, s4tDiscordWebhookURL
-    IniWrite, %s4tSendAccountXML%, Settings.ini, UserSettings, s4tSendAccountXML
-    IniWrite, %s4tGholdengo%, Settings.ini, UserSettings, s4tGholdengo
 
     ; Using FriendID field to provide a URL to download ids.txt is deprecated.
     if (inStr(FriendID, "http")) {
@@ -1118,6 +1009,7 @@ SumVariablesInJsonFile() {
 }
 
 CheckForUpdate() {
+    return ; Temporary disabled update check until I can get the new version working stable
     global githubUser, repoName, localVersion, zipPath, extractPath, scriptFolder
     url := "https://api.github.com/repos/" githubUser "/" repoName "/releases/latest"
 

@@ -20,7 +20,6 @@ WinHide % "ahk_id " DllCall("GetConsoleWindow", "ptr")
 
 global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, scriptName, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, Mains, showStatus, injectMethod, packMethod, loadDir, loadedAccount, nukeAccount, CheckShiningPackOnly, TrainerCheck, FullArtCheck, RainbowCheck, ShinyCheck, dateChange, foundGP, friendsAdded, minStars, PseudoGodPack, Palkia, Dialga, Mew, Pikachu, Charizard, Mewtwo, packArray, CrownCheck, ImmersiveCheck, InvalidCheck, slowMotion, screenShot, accountFile, invalid, starCount, keepAccount, minStarsA1Charizard, minStarsA1Mewtwo, minStarsA1Pikachu, minStarsA1a, minStarsA2Dialga, minStarsA2Palkia, minStarsA2a, minStarsA2b
 global DeadCheck
-global s4tEnabled, s4tSilent, s4t3Dmnd, s4t4Dmnd, s4t1Star, s4tGholdengo, s4tWP, s4tWPMinCards, s4tDiscordWebhookURL, s4tDiscordUserId, s4tSendAccountXml
 
 scriptName := StrReplace(A_ScriptName, ".ahk")
 winTitle := scriptName
@@ -76,18 +75,6 @@ IniRead, minStarsA2Dialga, %A_ScriptDir%\..\Settings.ini, UserSettings, minStars
 IniRead, minStarsA2Palkia, %A_ScriptDir%\..\Settings.ini, UserSettings, minStarsA2Palkia, 0
 IniRead, minStarsA2a, %A_ScriptDir%\..\Settings.ini, UserSettings, minStarsA2a, 0
 IniRead, minStarsA2b, %A_ScriptDir%\..\Settings.ini, UserSettings, minStarsA2b, 0
-
-IniRead, s4tEnabled, %A_ScriptDir%\..\Settings.ini, UserSettings, s4tEnabled, 0
-IniRead, s4tSilent, %A_ScriptDir%\..\Settings.ini, UserSettings, s4tSilent, 1
-IniRead, s4t3Dmnd, %A_ScriptDir%\..\Settings.ini, UserSettings, s4t3Dmnd, 0
-IniRead, s4t4Dmnd, %A_ScriptDir%\..\Settings.ini, UserSettings, s4t4Dmnd, 0
-IniRead, s4t1Star, %A_ScriptDir%\..\Settings.ini, UserSettings, s4t1Star, 0
-IniRead, s4tGholdengo, %A_ScriptDir%\..\Settings.ini, UserSettings, s4tGholdengo, 0
-IniRead, s4tWP, %A_ScriptDir%\..\Settings.ini, UserSettings, s4tWP, 0
-IniRead, s4tWPMinCards, %A_ScriptDir%\..\Settings.ini, UserSettings, s4tWPMinCards, 1
-IniRead, s4tDiscordWebhookURL, %A_ScriptDir%\..\Settings.ini, UserSettings, s4tDiscordWebhookURL
-IniRead, s4tDiscordUserId, %A_ScriptDir%\..\Settings.ini, UserSettings, s4tDiscordUserId
-IniRead, s4tSendAccountXml, %A_ScriptDir%\..\Settings.ini, UserSettings, s4tSendAccountXml, 1
 
 pokemonList := ["Palkia", "Dialga", "Mew", "Pikachu", "Charizard", "Mewtwo", "Arceus", "Shining"]
 
@@ -259,11 +246,13 @@ if(DeadCheck = 1){
             DoTutorial()
 
         ;    SquallTCGP 2025.03.12 -     Adding the delete method 5 Pack (Fast) to the wonder pick check.
-        if(deleteMethod = "5 Pack" || deleteMethod = "5 Pack (Fast)" || packMethod)
+        if(deleteMethod = "5 Pack" || deleteMethod = "5 Pack (Fast)" || deleteMethod = "13 Pack" || packMethod)
             if(!loadedAccount)
                 wonderPicked := DoWonderPick()
 
+        ; Add friends
         friendsAdded := AddFriends()
+        ; Opening pack 1
         SelectPack("First")
         PackOpening()
 
@@ -272,9 +261,11 @@ if(DeadCheck = 1){
             SelectPack()
         }
 
+        ; Opening pack 2
         PackOpening()
 
         if(!injectMethod || !loadedAccount)
+            ; Opening pack 3
             HourglassOpening() ;deletemethod check in here at the start
 
         if(wonderPicked) {
@@ -284,13 +275,14 @@ if(DeadCheck = 1){
             ;                         just to get around the checking for a level after opening a pack. This change is made based on the
             ;                         5p-no delete community mod created by DietPepperPhD in the discord server.
 
-            if(deleteMethod != "5 Pack (Fast)") {
+            if(deleteMethod != "5 Pack (Fast)" || deleteMethod != "13 Pack") {
                 friendsAdded := AddFriends(true)
             } else {
                 FindImageAndClick(120, 500, 155, 530, , "Social", 143, 518, 500)
                 FindImageAndClick(20, 500, 55, 530, , "Home", 40, 516, 500)
             }
             SelectPack("HGPack")
+            ; Opening pack 4
             PackOpening()
             if(packMethod) {
                 friendsAdded := AddFriends(true)
@@ -298,9 +290,38 @@ if(DeadCheck = 1){
                 PackOpening()
             }
             else {
+                ; Opening pack 5
                 HourglassOpening(true)
             }
         }
+
+        ; -- Do 13 pack --
+        if(deleteMethod = "13 Pack") {
+        HomeAndMission()
+        SelectPack("HGPack")
+        PackOpening() ;6
+        HourglassOpening(true) ;7
+        
+        HomeAndMission()
+        SelectPack("HGPack")
+        PackOpening() ;8
+        HourglassOpening(true) ;9
+        
+        HomeAndMission()
+        SelectPack("HGPack")
+        PackOpening() ;10
+        HourglassOpening(true) ;11
+        
+        HomeAndMission(1)
+        SelectPack("HGPack")
+        PackOpening() ;12
+        HomeAndMission(1)
+        SelectPack("HGPack")
+        PackOpening() ;13
+
+        }
+        ; -- end of 13 packs
+
 
         if (nukeAccount && !keepAccount && !injectMethod) {
             CreateStatusMessage("Deleting account...",,,, false)
@@ -1241,7 +1262,7 @@ CheckPack() {
     ; SquallTCGP 2025.03.12 - Just checking the packs count and setting them to 0 if it's number of packs is 3.
     ;                         This applies to any Delete Method except 5 Pack (Fast). This change is made based
     ;                         on the 5p-no delete community mod created by DietPepperPhD in the discord server.
-    if (deleteMethod != "5 Pack (Fast)") {
+    if (deleteMethod != "5 Pack (Fast)" || deleteMethod != "13 Pack") {
         if (packs = 3)
             packs := 0
     }
@@ -1335,164 +1356,6 @@ CheckPack() {
         restartGameInstance(foundLabel . " found. Continuing...", "GodPack")
     }
 
-    ; Check for tradeable cards.
-    if (s4tEnabled) {
-        found3Dmnd := 0
-        found4Dmnd := 0
-        found1Star := 0
-        foundGimmighoul := 0
-
-        if (s4t3Dmnd) {
-            found3Dmnd += FindBorders("3diamond")
-        }
-        if (s4t1Star) {
-            found1Star += FindBorders("1star")
-        }
-
-        if (s4t4Dmnd) {
-            ; Detecting a 4-diamond EX card isn't possible using a needle.
-            ; Start with 5 and substract other card types as efficiently as possible.
-            found4Dmnd := 5 - FindBorders("normal")
-
-            if (found4Dmnd > 0) {
-                if (s4t3Dmnd)
-                    found4Dmnd -= found3Dmnd
-                else
-                    found4Dmnd -= FindBorders("3diamond")
-            }
-            if (found4Dmnd > 0) {
-                if (s4t1Star)
-                    found4Dmnd -= found1Star
-                else
-                    found4Dmnd -= FindBorders("1star")
-            }
-
-            if (found4Dmnd > 0 && PseudoGodPack) {
-                found4Dmnd -= 2starCount
-            } else {
-                if (found4Dmnd > 0) {
-                    if (TrainerCheck)
-                        found4Dmnd -= foundTrainer
-                    else
-                        found4Dmnd -= FindBorders("trainer")
-                }
-                if (found4Dmnd > 0) {
-                    if (RainbowCheck)
-                        found4Dmnd -= foundRainbow
-                    else
-                        found4Dmnd -= FindBorders("rainbow")
-                }
-                if (found4Dmnd > 0) {
-                    if (FullArtCheck)
-                        found4Dmnd -= foundFullArt
-                    else
-                        found4Dmnd -= FindBorders("fullart")
-                }
-            }
-        }
-
-        if (s4tGholdengo && openPack = "Shining") {
-            foundGimmighoul += FindCard("gimmighoul")
-        }
-
-        foundTradeable := found3Dmnd + found4Dmnd + found1Star + foundGimmighoul
-
-        if (foundTradeable > 0)
-            FoundTradeable(found3Dmnd, found4Dmnd, found1Star, foundGimmighoul)
-    }
-}
-
-FoundTradeable(found3Dmnd := 0, found4Dmnd := 0, found1Star := 0, foundGimmighoul := 0) {
-    ; Not dead.
-    IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
-
-    ; Keep account.
-    keepAccount := true
-
-    foundTradeable := found3Dmnd + found4Dmnd + found1Star + foundGimmighoul
-
-    packDetailsFile := ""
-    packDetailsMessage := ""
-
-    if (found3Dmnd > 0) {
-        packDetailsFile .= "3DmndX" . found3Dmnd . "_"
-        packDetailsMessage .= "Three Diamond (x" . found3Dmnd . "), "
-    }
-    if (found4Dmnd > 0) {
-        packDetailsFile .= "4DmndX" . found4Dmnd . "_"
-        packDetailsMessage .= "Four Diamond EX (x" . found4Dmnd . "), "
-    }
-    if (found1Star > 0) {
-        packDetailsFile .= "1StarX" . found1Star . "_"
-        packDetailsMessage .= "One Star (x" . found1Star . "), "
-    }
-    if (foundGimmighoul > 0) {
-        packDetailsFile .= "GimmighoulX" . foundGimmighoul . "_"
-        packDetailsMessage .= "Gimmighoul (x" . foundGimmighoul . "), "
-    }
-
-    packDetailsFile := RTrim(packDetailsFile, "_")
-    packDetailsMessage := RTrim(packDetailsMessage, ", ")
-
-    accountFullPath := ""
-    accountFile := saveAccount("Tradeable", accountFullPath, packDetailsFile)
-    screenShot := Screenshot("Tradeable", "Trades", screenShotFileName)
-
-    statusMessage := "Tradeable cards found"
-    if (username)
-        statusMessage .= " by " . username
-
-    if (!s4tWP || (s4tWP && foundTradeable < s4tWPMinCards)) {
-        CreateStatusMessage("Tradeable cards found! Continuing...",,,, false)
-
-        logMessage := statusMessage . " in instance: " . scriptName . " (" . packs . " packs, " . openPack . ") File name: " . accountFile . " Screenshot file: " . screenShotFileName . " Backing up to the Accounts\\Trades folder and continuing..."
-        LogToFile(logMessage, "S4T.txt")
-
-        if (!s4tSilent && s4tDiscordWebhookURL) {
-            discordMessage := statusMessage . " in instance: " . scriptName . " (" . packs . " packs, " . openPack . ")\nFound: " . packDetailsMessage . "\nFile name: " . accountFile . "\nBacking up to the Accounts\\Trades folder and continuing..."
-            LogToDiscord(discordMessage, screenShot, true, (s4tSendAccountXml ? accountFullPath : ""),, s4tDiscordWebhookURL, s4tDiscordUserId)
-        }
-
-        return
-    }
-
-    friendCode := getFriendCode()
-
-    Sleep, 8000
-    fcScreenshot := Screenshot("FRIENDCODE", "Trades")
-
-    ; If we're doing the inject method, try to OCR our Username
-    try {
-        if (injectMethod && IsFunc("ocr")) {
-            ocrText := Func("ocr").Call(fcScreenshot, ocrLanguage)
-            ocrLines := StrSplit(ocrText, "`n")
-            len := ocrLines.MaxIndex()
-            if(len > 1) {
-                playerName := ocrLines[1]
-                playerID := RegExReplace(ocrLines[2], "[^0-9]", "")
-                ; playerID := SubStr(ocrLines[2], 1, 19)
-                username := playerName
-            }
-        }
-    } catch e {
-        LogToFile("Failed to OCR the friend code: " . e.message, "OCR.txt")
-    }
-
-    statusMessage := "Tradeable cards found"
-    if (username)
-        statusMessage .= " by " . username
-    if (friendCode)
-        statusMessage .= " (" . friendCode . ")"
-
-    logMessage := statusMessage . " in instance: " . scriptName . " (" . packs . " packs, " . openPack . ")\nFile name: " . accountFile . "\nScreenshot file: " . screenShotFileName . "\nBacking up to the Accounts\\Trades folder and continuing..."
-    LogToFile(StrReplace(logMessage, "\n", " "), "S4T.txt")
-
-    if (s4tDiscordWebhookURL) {
-        discordMessage := statusMessage . " in instance: " . scriptName . " (" . packs . " packs, " . openPack . ")\nFound: " . packDetailsMessage . "\nFile name: " . accountFile . "\nBacking up to the Accounts\\Trades folder and continuing..."
-        LogToDiscord(discordMessage, screenShot, true, (s4tSendAccountXml ? accountFullPath : ""), fcScreenshot, s4tDiscordWebhookURL, s4tDiscordUserId)
-    }
-
-    restartGameInstance("Tradeable cards found. Continuing...", "GodPack")
 }
 
 FoundStars(star) {
@@ -3013,3 +2876,51 @@ getChangeDateTime() {
     Screenshot()
 return
 */
+
+
+; Ported functions
+HomeAndMission(homeonly := 0) {
+	Sleep, 250
+	failSafe := A_TickCount
+	failSafeTime := 0
+	Leveled := 0
+	Loop {
+		if(!Leveled)
+			Leveled := LevelUp()
+		else
+			LevelUp()
+		FindImageAndClick(191, 393, 211, 411, , "Shop", 146, 470, 500, 1)
+		if(FindImageAndClick(120, 188, 140, 208, , "Album", 79, 86 , 500, 1)){
+			FindImageAndClick(191, 393, 211, 411, , "Shop", 142, 488, 500)
+			break
+		}
+		failSafeTime := (A_TickCount - failSafe) // 1000
+	}
+	if(!homeonly){
+	FindImageAndClick(191, 393, 211, 411, , "Shop", 142, 488, 500)
+	FindImageAndClick(180, 498, 190, 508, , "Mission_dino1", 261, 478, 1000)
+	FindImageAndClick(136, 158, 156, 190, , "Mission_dino2", 150, 286, 1000)
+	;FindImageAndClick(183, 235, 193, 245, 10, "Mission_dino", 261, 478, 500)
+	failSafe := A_TickCount
+	failSafeTime := 0
+	Loop {
+		Delay(1)
+		adbClick(139, 424)
+		Delay(1)
+		clickButton := FindOrLoseImage(145, 447, 258, 480, 80, "Button", 0, failSafeTime)
+		if(clickButton) {
+			adbClick(110, 369)
+		}
+		else if(FindOrLoseImage(191, 393, 211, 411, , "Shop", 1, failSafeTime)) {
+			adbInputEvent("111") ;send ESC
+			sleep, 1500
+		}
+		else
+			break
+		failSafeTime := (A_TickCount - failSafe) // 1000
+		CreateStatusMessage("In failsafe for WonderPick. " . failSafeTime "/45 seconds")
+		LogToFile("In failsafe for WonderPick. " . failSafeTime "/45 seconds")
+	}
+	}
+	return Leveled
+}
