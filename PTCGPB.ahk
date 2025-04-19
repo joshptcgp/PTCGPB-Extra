@@ -851,7 +851,7 @@ Start:
                     onlineAHK := "Online: " . RTrim(onlineAHK, ", ")
 
                 discMessage := heartBeatName ? "\n" . heartBeatName : ""
-                discMessage .= "\n" . onlineAHK . "\n" . offlineAHK . "\n" . packStatus . "\nVersion: " . RegExReplace(githubUser, "-") . repoName . "-" . localVersion
+                discMessage .= "\n" . onlineAHK . "\n" . offlineAHK . "\n" . packStatus . "\nVersion: " . githubUser . "-" . repoName . "-" . localVersion
                 discMessage .= typeMsg
                 discMessage .= selectMsg
 

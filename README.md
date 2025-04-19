@@ -9,6 +9,8 @@ This is an opinionated fork of [Arturo's PTCGPB](https://github.com/Arturo-1212/
 - 🎮 Added Control panel for better management / Killing stuck instances
 - 🔧 Improved frozen/stuck instance handling in Monitor.ahk
 - 🗑️ Removed save for trade feature (not suitable for reroll groups)
+- 🤖 Alias Generator for botting account usernames
+- ⚠️ Low Pack Per Hours Alert via Webhook
 
 ## License
 This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0).
