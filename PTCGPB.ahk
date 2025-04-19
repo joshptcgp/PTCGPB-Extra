@@ -54,7 +54,7 @@ InitializeJsonFile() ; Create or open the JSON file
 ; Create the main GUI for selecting number of instances
 IniRead, FriendID, Settings.ini, UserSettings, FriendID
 IniRead, waitTime, Settings.ini, UserSettings, waitTime, 5
-IniRead, Delay, Settings.ini, UserSettings, Delay, 250
+IniRead, Delay, Settings.ini, UserSettings, Delay, 150
 IniRead, folderPath, Settings.ini, UserSettings, folderPath, C:\Program Files\Netease
 IniRead, Columns, Settings.ini, UserSettings, Columns, 5
 IniRead, godPack, Settings.ini, UserSettings, godPack, Continue
@@ -62,8 +62,8 @@ IniRead, Instances, Settings.ini, UserSettings, Instances, 1
 IniRead, instanceStartDelay, Settings.ini, UserSettings, instanceStartDelay, 0
 IniRead, defaultLanguage, Settings.ini, UserSettings, defaultLanguage, Scale125
 IniRead, SelectedMonitorIndex, Settings.ini, UserSettings, SelectedMonitorIndex, 1
-IniRead, swipeSpeed, Settings.ini, UserSettings, swipeSpeed, 300
-IniRead, deleteMethod, Settings.ini, UserSettings, deleteMethod, 3 Pack
+IniRead, swipeSpeed, Settings.ini, UserSettings, swipeSpeed, 200
+IniRead, deleteMethod, Settings.ini, UserSettings, deleteMethod, 13 Pack
 IniRead, runMain, Settings.ini, UserSettings, runMain, 1
 IniRead, Mains, Settings.ini, UserSettings, Mains, 1
 IniRead, heartBeat, Settings.ini, UserSettings, heartBeat, 0
@@ -80,7 +80,7 @@ IniRead, CrownCheck, Settings.ini, UserSettings, CrownCheck, 0
 IniRead, ImmersiveCheck, Settings.ini, UserSettings, ImmersiveCheck, 0
 IniRead, InvalidCheck, Settings.ini, UserSettings, InvalidCheck, 0
 IniRead, PseudoGodPack, Settings.ini, UserSettings, PseudoGodPack, 0
-IniRead, minStars, Settings.ini, UserSettings, minStars, 0
+IniRead, minStars, Settings.ini, UserSettings, minStars, 2
 IniRead, Palkia, Settings.ini, UserSettings, Palkia, 0
 IniRead, Dialga, Settings.ini, UserSettings, Dialga, 0
 IniRead, Arceus, Settings.ini, UserSettings, Arceus, 0
@@ -108,6 +108,7 @@ IniRead, minStarsA2b, Settings.ini, UserSettings, minStarsA2b, 0
 
 IniRead, heartBeatDelay, Settings.ini, UserSettings, heartBeatDelay, 30
 IniRead, sendAccountXml, Settings.ini, UserSettings, sendAccountXml, 0
+IniRead, autoLaunchControlPanel, Settings.ini, UserSettings, autoLaunchControlPanel, 0
 
 ; Create a stylish GUI with custom colors and modern look
 Gui, Color, 1E1E1E, 333333 ; Dark theme background
@@ -267,22 +268,23 @@ Gui, Add, Text, x640 y25 %sectionColor%, 2* for SR:
 Gui, Add, Edit, vminStarsA2b w25 x700 y23 h20 -E0x200 Background2A2A2A cWhite Center, %minStarsA2b%
 
 Gui, Add, Text, x520 y53 %sectionColor%, Method:
-if (deleteMethod = "5 Pack")
+if (deleteMethod = "3 Pack")
     defaultDelete := 1
-else if (deleteMethod = "3 Pack")
+else if (deleteMethod = "5 Pack")
     defaultDelete := 2
 else if (deleteMethod = "5 Pack (Fast)")
     defaultDelete := 3
 else if (deleteMethod = "13 Pack")
     defaultDelete := 4
 ;    SquallTCGP 2025.03.12 -     Adding the delete method 5 Pack (Fast) to the delete method dropdown list.
-Gui, Add, DropDownList, vdeleteMethod gdeleteSettings choose%defaultDelete% x575 y48 w100 Background2A2A2A cWhite, 5 Pack|3 Pack|Inject|5 Pack (Fast)|13 Pack
+Gui, Add, DropDownList, vdeleteMethod gdeleteSettings choose%defaultDelete% x575 y48 w100 Background2A2A2A cWhite, 3 Pack|5 Pack|5 Pack (Fast)|13 Pack
 Gui, Add, Checkbox, % (packMethod ? "Checked" : "") " vpackMethod x520 y80 " . sectionColor, 1 Pack Method
 Gui, Add, Checkbox, % (nukeAccount ? "Checked" : "") " vnukeAccount x520 y100 " . sectionColor, Menu Delete Account
 
 ; ========== Save For Trade Settings Section ==========
 sectionColor := "cFFA500" ; Orange
-Gui, Add, GroupBox, x505 y130 w240 h175 %sectionColor%, Save For Trade Settings
+Gui, Add, GroupBox, x505 y130 w240 h175 %sectionColor%, Misc Settings
+Gui, Add, Checkbox, % (autoLaunchControlPanel ? "Checked" : "") " vautoLaunchControlPanel x520 y155 " . sectionColor, Auto Launch Control Panel
 
 
 
@@ -355,10 +357,10 @@ Gui, Tab
 
 ; ========== Action Buttons ==========
 Gui, Add, Button, gOpenLink x5 y522 w117, Buy Me a Coffee
-Gui, Add, Button, gOpenDiscord x+7 w117, Join Discord
+Gui, Add, Button, gOpenGithub x+7 w117, Check Releases
 Gui, Add, Button, gArrangeWindows x+7 w118, Arrange Windows
 Gui, Add, Button, gLaunchAllMumu x+7 w118, Launch All Mumu
-Gui, Add, Button, gSaveReload x+7 w117, Reload
+Gui, Add, Button, gSaveReload x+7 w117, Save and Reload
 Gui, Add, Button, gCheckForUpdates x+7 w117, Check Updates
 Gui, Add, Button, gStart x5 y+7 w740, START BOT
 
@@ -467,8 +469,8 @@ OpenLink:
     Run, https://buymeacoffee.com/aarturoo
 return
 
-OpenDiscord:
-    Run, https://discord.gg/C9Nyf7P4sT
+OpenGithub:
+    Run, https://github.com/joshptcgp/PTCGPB-Extra
 return
 
 SaveReload:
@@ -523,6 +525,7 @@ SaveReload:
     IniWrite, %vipIdsURL%, Settings.ini, UserSettings, vipIdsURL
     IniWrite, %autoLaunchMonitor%, Settings.ini, UserSettings, autoLaunchMonitor
     IniWrite, %instanceLaunchDelay%, Settings.ini, UserSettings, instanceLaunchDelay
+    IniWrite, %autoLaunchControlPanel%, Settings.ini, UserSettings, autoLaunchControlPanel
 
     minStarsA1Charizard := minStars
     minStarsA1Mewtwo := minStars
@@ -603,6 +606,7 @@ Start:
     IniWrite, %vipIdsURL%, Settings.ini, UserSettings, vipIdsURL
     IniWrite, %autoLaunchMonitor%, Settings.ini, UserSettings, autoLaunchMonitor
     IniWrite, %instanceLaunchDelay%, Settings.ini, UserSettings, instanceLaunchDelay
+    IniWrite, %autoLaunchControlPanel%, Settings.ini, UserSettings, autoLaunchControlPanel
 
     minStarsA1Charizard := minStars
     minStarsA1Mewtwo := minStars
@@ -704,6 +708,13 @@ Start:
         monitorFile := "Monitor.ahk"
         if(FileExist(monitorFile)) {
             Run, %monitorFile%
+        }
+    }
+
+    if(autoLaunchControlPanel) {
+        controlPanelFile := "ControlPanel.ahk"
+        if(FileExist(controlPanelFile)) {
+            Run, %controlPanelFile%
         }
     }
 

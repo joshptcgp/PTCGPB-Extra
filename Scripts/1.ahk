@@ -337,6 +337,8 @@ if(DeadCheck = 1){
         if (!loadedAccount)
             if (deleteMethod = "5 Pack" || packMethod)
                 packs := 5
+            else if (deleteMethod = "13 Pack")
+                packs := 13
 
         IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
 
