@@ -110,7 +110,9 @@ IniRead, heartBeatDelay, Settings.ini, UserSettings, heartBeatDelay, 30
 IniRead, sendAccountXml, Settings.ini, UserSettings, sendAccountXml, 0
 IniRead, autoLaunchControlPanel, Settings.ini, UserSettings, autoLaunchControlPanel, 0
 IniRead, gpFourOnly, Settings.ini, UserSettings, gpFourOnly, 0
-IniRead, aliasSuffix, Settings.ini, UserSettings, aliasSuffix, ""
+IniRead, aliasSuffix, Settings.ini, UserSettings, aliasSuffix
+IniRead, webhookForPPH, Settings.ini, UserSettings, webhookForPPH
+IniRead, pphAlertThreshold, Settings.ini, UserSettings, pphAlertThreshold, 0
 
 ; Create a stylish GUI with custom colors and modern look
 Gui, Color, 1E1E1E, 333333 ; Dark theme background
@@ -350,6 +352,12 @@ sectionColor := "cFFA500" ; Orange
 Gui, Add, Text, x270 y350 %sectionColor%, Alias Suffix (English chars only):
 Gui, Add, Edit, valiasSuffix w460 h20 y+5 -E0x200 Background2A2A2A cWhite, %aliasSuffix%
 
+; Add Pack Per Hour Alert settings
+Gui, Add, Text, x270 y+10 %sectionColor%, Webhook for Pack Per Hour Alert:
+Gui, Add, Edit, vwebhookForPPH w225 h20 y+5 -E0x200 Background2A2A2A cWhite, %webhookForPPH%
+Gui, Add, Text, x+10 %sectionColor%, Alert if falls below:
+Gui, Add, Edit, vpphAlertThreshold w225 h20 y+5 -E0x200 Background2A2A2A cWhite Center, %pphAlertThreshold%
+
 ; End tabs
 Gui, Tab
 
@@ -528,6 +536,8 @@ SaveReload:
     IniWrite, %autoLaunchControlPanel%, Settings.ini, UserSettings, autoLaunchControlPanel
     IniWrite, %gpFourOnly%, Settings.ini, UserSettings, gpFourOnly
     IniWrite, %aliasSuffix%, Settings.ini, UserSettings, aliasSuffix
+    IniWrite, %webhookForPPH%, Settings.ini, UserSettings, webhookForPPH
+    IniWrite, %pphAlertThreshold%, Settings.ini, UserSettings, pphAlertThreshold
 
     minStarsA1Charizard := minStars
     minStarsA1Mewtwo := minStars
@@ -611,6 +621,8 @@ Start:
     IniWrite, %autoLaunchControlPanel%, Settings.ini, UserSettings, autoLaunchControlPanel
     IniWrite, %gpFourOnly%, Settings.ini, UserSettings, gpFourOnly
     IniWrite, %aliasSuffix%, Settings.ini, UserSettings, aliasSuffix
+    IniWrite, %webhookForPPH%, Settings.ini, UserSettings, webhookForPPH
+    IniWrite, %pphAlertThreshold%, Settings.ini, UserSettings, pphAlertThreshold
 
     minStarsA1Charizard := minStars
     minStarsA1Mewtwo := minStars
@@ -784,6 +796,8 @@ Start:
         ; Display pack status at the bottom of the first reroll instance
         DisplayPackStatus(packStatus, ((runMain ? Mains * scaleParam : 0) + 5), 490)
 
+
+
         if(heartBeat)
             if((A_Index = 1 || (Mod(A_Index, (heartBeatDelay // 0.5)) = 0))) {
                 onlineAHK := ""
@@ -843,6 +857,23 @@ Start:
 
                 LogToDiscord(discMessage,, false,,, heartBeatWebhookURL)
             }
+
+        ; Check for pack per hour alert if conditions are met
+        if (mminutes >= 40 && webhookForPPH != "" && pphAlertThreshold > 0) {
+            ; Calculate packs per hour
+            packsPerHour := (total / mminutes) * 60
+            
+            ; Check if packs per hour is below threshold
+            if (packsPerHour < pphAlertThreshold) {
+                alertMsg := "⚠️ PACK PER HOUR ALERT ⚠️`n"
+                alertMsg .= "Current Rate: " . Round(packsPerHour, 2) . " packs/hour`n"
+                alertMsg .= "Target Rate: " . pphAlertThreshold . " packs/hour`n"
+                alertMsg .= "Total Packs: " . total . " in " . mminutes . " minutes"
+                
+                ; Send alert to Discord
+                LogToDiscord(alertMsg, , true, , , webhookForPPH)
+            }
+        }
     }
 Return
 
