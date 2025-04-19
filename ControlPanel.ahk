@@ -42,18 +42,18 @@ Gui, Color, %monokaiBg%, %monokaiGroup%
 Gui, Font, s10 c%monokaiText%, Segoe UI
 
 ; MuMu Instance Control Section
-Gui, Add, GroupBox, x10 y10 w300 h240 c%monokaiText%, MuMu Instance Control
+Gui, Add, GroupBox, x10 y10 w300 h240 c%monokaiAccent% Background%monokaiGroup%, MuMu Instance Control
 Gui, Add, Button, x20 y30 w280 h30 gKillAllMumu Background%monokaiButton% c%monokaiText%, Kill All MuMu Instances
-Gui, Add, Text, x20 y70 c%monokaiText%, Kill Individual MuMu Instances:
-Gui, Add, Button, x20 y90 w40 h30 gKillMumu1 Background%monokaiButton% c%monokaiText%, 1
-Gui, Add, Button, x65 y90 w40 h30 gKillMumu2 Background%monokaiButton% c%monokaiText%, 2
-Gui, Add, Button, x110 y90 w40 h30 gKillMumu3 Background%monokaiButton% c%monokaiText%, 3
-Gui, Add, Button, x155 y90 w40 h30 gKillMumu4 Background%monokaiButton% c%monokaiText%, 4
-Gui, Add, Button, x200 y90 w40 h30 gKillMumu5 Background%monokaiButton% c%monokaiText%, 5
-Gui, Add, Button, x245 y90 w40 h30 gKillMumu6 Background%monokaiButton% c%monokaiText%, 6
+Gui, Add, Text, x20 y70 c%monokaiAccent%, Toggle Individual MuMu Instances:
+Gui, Add, Button, x20 y90 w40 h30 gToggleMumu1 Background%monokaiButton% c%monokaiText% vMumu1Btn, 1
+Gui, Add, Button, x65 y90 w40 h30 gToggleMumu2 Background%monokaiButton% c%monokaiText% vMumu2Btn, 2
+Gui, Add, Button, x110 y90 w40 h30 gToggleMumu3 Background%monokaiButton% c%monokaiText% vMumu3Btn, 3
+Gui, Add, Button, x155 y90 w40 h30 gToggleMumu4 Background%monokaiButton% c%monokaiText% vMumu4Btn, 4
+Gui, Add, Button, x200 y90 w40 h30 gToggleMumu5 Background%monokaiButton% c%monokaiText% vMumu5Btn, 5
+Gui, Add, Button, x245 y90 w40 h30 gToggleMumu6 Background%monokaiButton% c%monokaiText% vMumu6Btn, 6
 
 ; Disk Cache Cleaning Section
-Gui, Add, Text, x20 y130 c%monokaiText%, Clean Disk Cache:
+Gui, Add, Text, x20 y130 c%monokaiAccent%, Clean Disk Cache:
 Gui, Add, Button, x20 y150 w40 h30 gCleanDisk1 Background%monokaiButton% c%monokaiText%, 1
 Gui, Add, Button, x65 y150 w40 h30 gCleanDisk2 Background%monokaiButton% c%monokaiText%, 2
 Gui, Add, Button, x110 y150 w40 h30 gCleanDisk3 Background%monokaiButton% c%monokaiText%, 3
@@ -62,33 +62,35 @@ Gui, Add, Button, x200 y150 w40 h30 gCleanDisk5 Background%monokaiButton% c%mono
 Gui, Add, Button, x245 y150 w40 h30 gCleanDisk6 Background%monokaiButton% c%monokaiText%, 6
 
 ; AHK Script Control Section
-Gui, Add, GroupBox, x10 y260 w300 h180 c%monokaiText%, AHK Script Control
+Gui, Add, GroupBox, x10 y260 w300 h180 c%monokaiAccent% Background%monokaiGroup%, AHK Script Control
 Gui, Add, Button, x20 y280 w280 h30 gKillAllAHK Background%monokaiButton% c%monokaiText%, Kill All AHK Scripts
-Gui, Add, Text, x20 y320 c%monokaiText%, Kill Individual AHK Scripts:
-Gui, Add, Button, x20 y340 w40 h30 gKillAHK1 Background%monokaiButton% c%monokaiText%, 1
-Gui, Add, Button, x65 y340 w40 h30 gKillAHK2 Background%monokaiButton% c%monokaiText%, 2
-Gui, Add, Button, x110 y340 w40 h30 gKillAHK3 Background%monokaiButton% c%monokaiText%, 3
-Gui, Add, Button, x155 y340 w40 h30 gKillAHK4 Background%monokaiButton% c%monokaiText%, 4
-Gui, Add, Button, x200 y340 w40 h30 gKillAHK5 Background%monokaiButton% c%monokaiText%, 5
-Gui, Add, Button, x245 y340 w40 h30 gKillAHK6 Background%monokaiButton% c%monokaiText%, 6
+Gui, Add, Text, x20 y320 c%monokaiAccent%, Toggle Individual AHK Scripts:
+Gui, Add, Button, x20 y340 w40 h30 gToggleAHK1 Background%monokaiButton% c%monokaiText% vAHK1Btn, 1
+Gui, Add, Button, x65 y340 w40 h30 gToggleAHK2 Background%monokaiButton% c%monokaiText% vAHK2Btn, 2
+Gui, Add, Button, x110 y340 w40 h30 gToggleAHK3 Background%monokaiButton% c%monokaiText% vAHK3Btn, 3
+Gui, Add, Button, x155 y340 w40 h30 gToggleAHK4 Background%monokaiButton% c%monokaiText% vAHK4Btn, 4
+Gui, Add, Button, x200 y340 w40 h30 gToggleAHK5 Background%monokaiButton% c%monokaiText% vAHK5Btn, 5
+Gui, Add, Button, x245 y340 w40 h30 gToggleAHK6 Background%monokaiButton% c%monokaiText% vAHK6Btn, 6
 
 ; Main Instance Control Section
-Gui, Add, GroupBox, x10 y450 w300 h60 c%monokaiText%, Main Instance Control
-Gui, Add, Button, x20 y470 w280 h30 gKillMainInstance Background%monokaiButton% c%monokaiText%, Kill Main Instance
+Gui, Add, GroupBox, x10 y450 w300 h60 c%monokaiAccent% Background%monokaiGroup%, Main Instance Control
+Gui, Add, Button, x20 y470 w280 h30 gToggleMainInstance Background%monokaiButton% c%monokaiText% vMainInstanceBtn, Toggle Main Instance
 
 ; Status Section
-Gui, Add, GroupBox, x10 y520 w300 h120 c%monokaiText%, Status
+Gui, Add, GroupBox, x10 y520 w300 h120 c%monokaiAccent% Background%monokaiGroup%, Status
 Gui, Add, Text, x20 y540 w280 h60 vStatusText c%monokaiText%, Checking instances...
 Gui, Add, Button, x20 y610 w280 h20 gRefreshStatus Background%monokaiButton% c%monokaiText%, Refresh Status
 
 ; Utility Section
-Gui, Add, GroupBox, x320 y10 w200 h130 c%monokaiText%, Utilities
+Gui, Add, GroupBox, x320 y10 w200 h200 c%monokaiAccent% Background%monokaiGroup%, Utilities
 Gui, Add, Button, x330 y30 w180 h30 gOpenProjectFolder Background%monokaiButton% c%monokaiText%, Open Project Folder
 Gui, Add, Button, x330 y65 w180 h30 gOpenLogsFolder Background%monokaiButton% c%monokaiText%, Open Logs Folder
 Gui, Add, Button, x330 y100 w180 h30 gToggleMonitor Background%monokaiButton% c%monokaiText%, Toggle Monitor.ahk
+Gui, Add, Button, x330 y135 w180 h30 gTogglePTCGPB Background%monokaiButton% c%monokaiText%, Toggle PTCGPB.ahk
+Gui, Add, Button, x330 y170 w180 h30 gCheckUpdate Background%monokaiButton% c%monokaiText%, Check For Updates
 
 ; Show GUI
-Gui, Show, w530 h650, PTCGP Control Panel by Josh
+Gui, Show, w530 h650, PTCGP-Extra Control Panel by Josh
 
 ; Initial status check
 SetTimer, UpdateStatus, 5000
@@ -164,6 +166,69 @@ CleanDisk6:
     cleanInstanceDisk(6)
 return
 
+; Functions for toggling MuMu instances
+ToggleMumu1:
+    toggleInstance(1, "Mumu1Btn")
+return
+
+ToggleMumu2:
+    toggleInstance(2, "Mumu2Btn")
+return
+
+ToggleMumu3:
+    toggleInstance(3, "Mumu3Btn")
+return
+
+ToggleMumu4:
+    toggleInstance(4, "Mumu4Btn")
+return
+
+ToggleMumu5:
+    toggleInstance(5, "Mumu5Btn")
+return
+
+ToggleMumu6:
+    toggleInstance(6, "Mumu6Btn")
+return
+
+; Functions for toggling AHK scripts
+ToggleAHK1:
+    toggleAHK("1.ahk", "AHK1Btn")
+return
+
+ToggleAHK2:
+    toggleAHK("2.ahk", "AHK2Btn")
+return
+
+ToggleAHK3:
+    toggleAHK("3.ahk", "AHK3Btn")
+return
+
+ToggleAHK4:
+    toggleAHK("4.ahk", "AHK4Btn")
+return
+
+ToggleAHK5:
+    toggleAHK("5.ahk", "AHK5Btn")
+return
+
+ToggleAHK6:
+    toggleAHK("6.ahk", "AHK6Btn")
+return
+
+ToggleMainInstance:
+    if (runMain) {
+        Loop %Mains% {
+            mainInstanceName := "Main" . (A_Index > 1 ? A_Index : "")
+            toggleInstance(mainInstanceName, "MainInstanceBtn")
+        }
+    }
+return
+
+TogglePTCGPB:
+    toggleAHK("PTCGPB.ahk", "PTCGPBBtn")
+return
+
 ; Functions for killing AHK scripts
 KillAllAHK:
     Loop %Instances% {
@@ -175,6 +240,8 @@ KillAllAHK:
             killAHK(mainInstanceName . ".ahk")
         }
     }
+    killAHK("Monitor.ahk")
+    killAHK("PTCGPB.ahk")
     Gosub, UpdateStatus
 return
 
@@ -230,19 +297,45 @@ UpdateStatus:
     if (runMain) {
         Loop %Mains% {
             mainInstanceName := "Main" . (A_Index > 1 ? A_Index : "")
-            if (checkInstance(mainInstanceName))
+            if (checkInstance(mainInstanceName)) {
                 status .= mainInstanceName . ", "
-            if (checkAHK(mainInstanceName . ".ahk"))
+                GuiControl,, MainInstanceBtn, %mainInstanceName% *
+            } else {
+                GuiControl,, MainInstanceBtn, %mainInstanceName%
+            }
+            if (checkAHK(mainInstanceName . ".ahk")) {
                 status .= mainInstanceName . ".ahk, "
+                GuiControl,, AHK%A_Index%Btn, %mainInstanceName% *
+            } else {
+                GuiControl,, AHK%A_Index%Btn, %mainInstanceName%
+            }
         }
     }
     
     ; Check regular instances
     Loop %Instances% {
-        if (checkInstance(A_Index))
+        if (checkInstance(A_Index)) {
             status .= A_Index . ", "
-        if (checkAHK(A_Index . ".ahk"))
+            GuiControl,, Mumu%A_Index%Btn, %A_Index% *
+        } else {
+            GuiControl,, Mumu%A_Index%Btn, %A_Index%
+        }
+        if (checkAHK(A_Index . ".ahk")) {
             status .= A_Index . ".ahk, "
+            GuiControl,, AHK%A_Index%Btn, %A_Index% *
+        } else {
+            GuiControl,, AHK%A_Index%Btn, %A_Index%
+        }
+    }
+    
+    ; Check Monitor.ahk
+    if (checkAHK("Monitor.ahk")) {
+        status .= "Monitor.ahk, "
+    }
+    
+    ; Check PTCGPB.ahk
+    if (checkAHK("PTCGPB.ahk")) {
+        status .= "PTCGPB.ahk, "
     }
     
     GuiControl,, StatusText, %status%
@@ -480,5 +573,35 @@ LogToFile(message, logFile) {
     FileAppend, % "[" readableTime "] " message "`n", %logFile%
 }
 
+; Helper function to toggle an instance
+toggleInstance(instanceNum, buttonVar) {
+    if (checkInstance(instanceNum)) {
+        killInstance(instanceNum)
+        GuiControl,, %buttonVar%, %instanceNum%
+    } else {
+        ; Launch the instance
+        Run, %mumuManagerPath% api -v %instanceNum% launch_player,, Hide
+        GuiControl,, %buttonVar%, %instanceNum% *
+    }
+    Gosub, UpdateStatus
+}
+
+; Helper function to toggle an AHK script
+toggleAHK(scriptName, buttonVar) {
+    if (checkAHK(scriptName)) {
+        killAHK(scriptName)
+        GuiControl,, %buttonVar%, % SubStr(scriptName, 1, InStr(scriptName, ".") - 1)
+    } else {
+        ; Launch the script
+        Run, %A_ScriptDir%\%scriptName%
+        GuiControl,, %buttonVar%, % SubStr(scriptName, 1, InStr(scriptName, ".") - 1) " *"
+    }
+    Gosub, UpdateStatus
+}
+
 GuiClose:
 ExitApp 
+
+CheckUpdate:
+    Run, https://github.com/joshptcgp/PTCGPB-Extra
+return 

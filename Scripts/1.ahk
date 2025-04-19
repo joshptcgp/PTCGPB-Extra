@@ -2553,28 +2553,43 @@ PackOpening() {
 
     CheckPack()
 
-    FindImageAndClick(233, 486, 272, 519, , "Skip", 146, 494) ;click on next until skip button appears
-
-    failSafe := A_TickCount
-    failSafeTime := 0
-    Loop {
-        Delay(1)
-        if(FindOrLoseImage(233, 486, 272, 519, , "Skip", 0, failSafeTime)) {
-            adbClick(239, 497)
-        } else if(FindOrLoseImage(120, 70, 150, 100, , "Next", 0, failSafeTime)) {
-            adbClick(146, 494) ;146, 494
-        } else if(FindOrLoseImage(120, 70, 150, 100, , "Next2", 0, failSafeTime)) {
-            adbClick(146, 494) ;146, 494
-        } else if(FindOrLoseImage(121, 465, 140, 485, , "ConfirmPack", 0, failSafeTime)) {
-            break
-        } else if(FindOrLoseImage(178, 193, 251, 282, , "Hourglass", 0, failSafeTime)) {
-            break
-        }
-        failSafeTime := (A_TickCount - failSafe) // 1000
-        CreateStatusMessage("Waiting for Home`n(" . failSafeTime . "/45 seconds)")
-        if(failSafeTime > 45)
-            restartGameInstance("Stuck at Home")
-    }
+	no_new := false 
+	failSafe := A_TickCount
+	failSafeTime := 0
+	Loop { ;click on next until skip button appears
+		adbClick(146, 494)
+		if(FindOrLoseImage(233, 486, 272, 519, , "Skip", 0, failSafeTime)){
+			break
+		}else if(FindOrLoseImage(20, 500, 55, 530, , "Home", 0, failSafeTime)){
+			no_new := true 
+			break
+		}
+		Sleep, 500
+		failSafeTime := (A_TickCount - failSafe) // 1000
+	}
+	failSafe := A_TickCount
+	failSafeTime := 0
+	Loop {
+		if(no_new)
+			break
+		Delay(1)
+		if(FindOrLoseImage(233, 486, 272, 519, , "Skip", 0, failSafeTime)) {
+			adbClick(239, 497)
+		} else if(FindOrLoseImage(120, 70, 150, 100, , "Next", 0, failSafeTime)) {
+			adbClick(146, 494) ;146, 494
+		} else if(FindOrLoseImage(120, 70, 150, 100, , "Next2", 0, failSafeTime)) {
+			adbClick(146, 494) ;146, 494
+		} else if(FindOrLoseImage(121, 465, 140, 485, , "ConfirmPack", 0, failSafeTime)) {
+			break
+		} else if(FindOrLoseImage(178, 193, 251, 282, , "Hourglass", 0, failSafeTime)) {
+			break
+		}
+		failSafeTime := (A_TickCount - failSafe) // 1000
+		CreateStatusMessage("In failsafe for Home. " . failSafeTime "/45 seconds")
+		LogToFile("In failsafe for Home. " . failSafeTime "/45 seconds")
+		if(failSafeTime > 45)
+			restartGameInstance("Stuck at Home")
+	}
 }
 
 HourglassOpening(HG := false) {
@@ -2672,28 +2687,43 @@ HourglassOpening(HG := false) {
 
     FindImageAndClick(0, 98, 116, 125, 5, "Opening", 239, 497) ;skip through cards until results opening screen
 
-    CheckPack()
-
-    FindImageAndClick(233, 486, 272, 519, , "Skip", 146, 494) ;click on next until skip button appears
-
-    failSafe := A_TickCount
-    failSafeTime := 0
-    Loop {
-        Delay(1)
-        if(FindOrLoseImage(233, 486, 272, 519, , "Skip", 0, failSafeTime)) {
-            adbClick(239, 497)
-        } else if(FindOrLoseImage(120, 70, 150, 100, , "Next", 0, failSafeTime)) {
-            adbClick(146, 494) ;146, 494
-        } else if(FindOrLoseImage(120, 70, 150, 100, , "Next2", 0, failSafeTime)) {
-            adbClick(146, 494) ;146, 494
-        } else if(FindOrLoseImage(121, 465, 140, 485, , "ConfirmPack", 0, failSafeTime)) {
-            break
-        }
-        failSafeTime := (A_TickCount - failSafe) // 1000
-        CreateStatusMessage("Waiting for ConfirmPack`n(" . failSafeTime . "/45 seconds)")
-        if(failSafeTime > 45)
-            restartGameInstance("Stuck at ConfirmPack")
-    }
+	CheckPack()
+    
+	no_new := false 
+	failSafe := A_TickCount
+	failSafeTime := 0
+	Loop { ;click on next until skip button appears
+		adbClick(146, 494)
+		if(FindOrLoseImage(233, 486, 272, 519, , "Skip", 0, failSafeTime)){
+			break
+		}else if(FindOrLoseImage(20, 500, 55, 530, , "Home", 0, failSafeTime)){
+			no_new := true 
+			break
+		}
+		Sleep, 500
+		failSafeTime := (A_TickCount - failSafe) // 1000
+	}
+	failSafe := A_TickCount
+	failSafeTime := 0
+	Loop {
+		if(no_new)
+			break
+		Delay(1)
+		if(FindOrLoseImage(233, 486, 272, 519, , "Skip", 0, failSafeTime)) {
+			adbClick(239, 497)
+		} else if(FindOrLoseImage(120, 70, 150, 100, , "Next", 0, failSafeTime)) {
+			adbClick(146, 494) ;146, 494
+		} else if(FindOrLoseImage(120, 70, 150, 100, , "Next2", 0, failSafeTime)) {
+			adbClick(146, 494) ;146, 494
+		} else if(FindOrLoseImage(121, 465, 140, 485, , "ConfirmPack", 0, failSafeTime)) {
+			break
+		}
+		failSafeTime := (A_TickCount - failSafe) // 1000
+		CreateStatusMessage("In failsafe for ConfirmPack. " . failSafeTime "/45 seconds")
+		LogToFile("In failsafe for ConfirmPack. " . failSafeTime "/45 seconds")
+		if(failSafeTime > 45)
+			restartGameInstance("Stuck at ConfirmPack")
+	}
 }
 
 getFriendCode() {
