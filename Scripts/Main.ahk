@@ -53,7 +53,7 @@ IniRead, ocrLanguage, %A_ScriptDir%\..\Settings.ini, UserSettings, ocrLanguage, 
 IniRead, clientLanguage, %A_ScriptDir%\..\Settings.ini, UserSettings, clientLanguage, en
 IniRead, minStars, %A_ScriptDir%\..\Settings.ini, UserSettings, minStars, 0
 IniRead, minStarsA2b, %A_ScriptDir%\..\Settings.ini, UserSettings, minStarsA2b, 0
-
+IniRead, gpFourOnly, Settings.ini, UserSettings, gpFourOnly, 0
 ; connect adb
 instanceSleep := scriptName * 1000
 Sleep, %instanceSleep%
@@ -1020,7 +1020,7 @@ GetFriendAccountsFromFile(filePath, ByRef includesIdsAndNames) {
     ; Returns:
     ;   (Array) - An array of FriendAccount objects, parsed from the file.
     ; ------------------------------------------------------------------------------
-    global minStars, minStarsA2b
+    global minStars, minStarsA2b, gpFourOnly
     friendList := []  ; Create an empty array
     includesIdsAndNames := false
 
@@ -1065,6 +1065,11 @@ GetFriendAccountsFromFile(filePath, ByRef includesIdsAndNames) {
             continue
 
         ; Trim spaces and create a FriendAccount object
+        if (gpFourOnly) {
+            minStars := 4
+            minStarsA2b := 4
+        }
+        
         if (twoStarCount == ""
             || (packName != "Shining" && twoStarCount >= minStars)
             || (packName == "Shining" && twoStarCount >= minStarsA2b)

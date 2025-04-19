@@ -22,6 +22,10 @@ if !FileExist(mumuFolder){
     MsgBox, 16, , Double check your folder path! It should be the one that contains the MuMuPlayer 12 folder! `nDefault is just C:\Program Files\Netease
     ExitApp
 }
+
+; Set MuMuManager.exe location
+mumuManagerPath := mumuFolder "\shell\MuMuManager.exe"
+
 Loop {
     ; Loop through each instance, check if it's started, and start it if it's not
     launched := 0
@@ -72,26 +76,27 @@ Loop {
     Sleep, 30000
 }
 
-killAHK(scriptName := "")
-{
+killAHK(scriptName := "") {
     killed := 0
-
     if(scriptName != "") {
         DetectHiddenWindows, On
         WinGet, IDList, List, ahk_class AutoHotkey
-        Loop %IDList%
-        {
+        Loop %IDList% {
             ID:=IDList%A_Index%
             WinGetTitle, ATitle, ahk_id %ID%
             if InStr(ATitle, "\" . scriptName) {
-                ; MsgBox, Killing: %ATitle%
-                WinKill, ahk_id %ID% ;kill
-                ; WinClose, %fullScriptPath% ahk_class AutoHotkey
+                WinGet, pid, PID, ahk_id %ID%
+                WinKill, ahk_id %ID%
                 killed := killed + 1
+                
+                ; Verify process is actually dead
+                Process, Exist, %pid%
+                if (ErrorLevel) {
+                    RunWait, taskkill /f /pid %pid% /t,, Hide
+                }
             }
         }
     }
-
     return killed
 }
 
@@ -115,16 +120,61 @@ checkAHK(scriptName := "")
     return cnt
 }
 
-killInstance(instanceNum := "")
-{
+killInstance(instanceNum := "") {
+    global mumuManagerPath, mumuFolder
     killed := 0
-
+    maxRetries := 3
+    retryDelay := 2000 ; 2 seconds
+    
+    ; First try to get the MuMu instance number
+    mumuNum := getMumuInstanceNumFromPlayerName(instanceNum)
+    
+    ; If we found a valid MuMu instance number, try to shut it down properly using MuMuManager
+    if (mumuNum != "") {
+        ; Run the MuMuManager command to properly shut down the instance
+        RunWait, %mumuManagerPath% api -v %mumuNum% shutdown_player,, Hide
+        
+        ; Wait a moment for the processes to terminate
+        Sleep, 5000
+        
+        ; Check if the instance is still running
+        pID := checkInstance(instanceNum)
+        if (!pID) {
+            ; Instance was successfully shut down
+            killed := 1
+            LogToFile("Properly shut down instance " . instanceNum . " using MuMuManager", "ControlPanel.txt")
+            return killed
+        }
+    }
+    
+    ; If MuMuManager method failed or no instance number was found, fall back to the original method
     pID := checkInstance(instanceNum)
     if pID {
         Process, Close, %pID%
         killed := killed + 1
+        
+        ; Verify process is actually dead
+        Process, Exist, %pID%
+        if (ErrorLevel) {
+            ; Forceful termination if needed
+            Loop %maxRetries% {
+                RunWait, taskkill /f /pid %pID% /t,, Hide
+                Sleep %retryDelay%
+                Process, Exist, %pID%
+                if (!ErrorLevel) {
+                    killed := 1
+                    break
+                }
+            }
+        }
+        
+        ; Try to kill any remaining MuMu processes for this instance
+        ; RunWait, taskkill /f /im MuMuVMMHeadless.exe /fi "WINDOWTITLE eq %instanceNum%" /t,, Hide
+        ; RunWait, taskkill /f /im MuMuVMMSVC.exe /fi "WINDOWTITLE eq %instanceNum%" /t,, Hide
+        
+        LogToFile("Killed instance " . instanceNum . " using fallback method", "ControlPanel.txt")
     }
-
+    
     return killed
 }
 

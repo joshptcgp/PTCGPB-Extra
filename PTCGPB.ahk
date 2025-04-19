@@ -109,6 +109,7 @@ IniRead, minStarsA2b, Settings.ini, UserSettings, minStarsA2b, 0
 IniRead, heartBeatDelay, Settings.ini, UserSettings, heartBeatDelay, 30
 IniRead, sendAccountXml, Settings.ini, UserSettings, sendAccountXml, 0
 IniRead, autoLaunchControlPanel, Settings.ini, UserSettings, autoLaunchControlPanel, 0
+IniRead, gpFourOnly, Settings.ini, UserSettings, gpFourOnly, 0
 
 ; Create a stylish GUI with custom colors and modern look
 Gui, Color, 1E1E1E, 333333 ; Dark theme background
@@ -285,6 +286,7 @@ Gui, Add, Checkbox, % (nukeAccount ? "Checked" : "") " vnukeAccount x520 y100 " 
 sectionColor := "cFFA500" ; Orange
 Gui, Add, GroupBox, x505 y130 w240 h175 %sectionColor%, Misc Settings
 Gui, Add, Checkbox, % (autoLaunchControlPanel ? "Checked" : "") " vautoLaunchControlPanel x520 y155 " . sectionColor, Auto Launch Control Panel
+Gui, Add, Checkbox, % (gpFourOnly ? "Checked" : "") " vgpFourOnly x520 y175 " . sectionColor, [GPTest] Only Four 2* Above
 
 
 
@@ -526,6 +528,7 @@ SaveReload:
     IniWrite, %autoLaunchMonitor%, Settings.ini, UserSettings, autoLaunchMonitor
     IniWrite, %instanceLaunchDelay%, Settings.ini, UserSettings, instanceLaunchDelay
     IniWrite, %autoLaunchControlPanel%, Settings.ini, UserSettings, autoLaunchControlPanel
+    IniWrite, %gpFourOnly%, Settings.ini, UserSettings, gpFourOnly
 
     minStarsA1Charizard := minStars
     minStarsA1Mewtwo := minStars
@@ -607,6 +610,7 @@ Start:
     IniWrite, %autoLaunchMonitor%, Settings.ini, UserSettings, autoLaunchMonitor
     IniWrite, %instanceLaunchDelay%, Settings.ini, UserSettings, instanceLaunchDelay
     IniWrite, %autoLaunchControlPanel%, Settings.ini, UserSettings, autoLaunchControlPanel
+    IniWrite, %gpFourOnly%, Settings.ini, UserSettings, gpFourOnly
 
     minStarsA1Charizard := minStars
     minStarsA1Mewtwo := minStars
@@ -833,7 +837,7 @@ Start:
                     onlineAHK := "Online: " . RTrim(onlineAHK, ", ")
 
                 discMessage := heartBeatName ? "\n" . heartBeatName : ""
-                discMessage .= "\n" . onlineAHK . "\n" . offlineAHK . "\n" . packStatus . "\nVersion: " . RegExReplace(githubUser, "-.*$") . "-" . localVersion
+                discMessage .= "\n" . onlineAHK . "\n" . offlineAHK . "\n" . packStatus . "\nVersion: " . RegExReplace(githubUser, "-.*$") . repoName . "-" . localVersion
                 discMessage .= typeMsg
                 discMessage .= selectMsg
 
