@@ -1,4 +1,4 @@
-# **__PTCGPB-Extra: Optimized Group Rerolling Fork__** ⚡
+# **__PTCGPB-Extra: Optimized For Group Rerolling__** ⚡
 
 This is an opinionated fork of [Arturo's PTCGPB](https://github.com/Arturo-1212/PTCGPB) optimized for group rerolling scenarios, everything unrelated for group rerolling are either removed or untouched.
 
