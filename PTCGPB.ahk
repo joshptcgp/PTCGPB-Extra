@@ -8,7 +8,7 @@ SetTitleMatchMode, 3
 
 githubUser := "joshptcgp"
 repoName := "PTCGPB-Extra"
-localVersion := "v6.3.29"
+localVersion := "v6.3.30"
 scriptFolder := A_ScriptDir
 zipPath := A_Temp . "\update.zip"
 extractPath := A_Temp . "\update"
@@ -364,7 +364,7 @@ Gui, Add, Button, gSaveReload x+7 w117, Save and Reload
 Gui, Add, Button, gCheckForUpdates x+7 w117, Check Updates
 Gui, Add, Button, gStart x5 y+7 w740, START BOT
 
-Gui, Show, , %localVersion% PTCGPB Bot Setup [Non-Commercial 4.0 International License]
+Gui, Show, , %localVersion% PTCGPB-Extra Bot Setup [Non-Commercial 4.0 International License]
 Return
 
 
