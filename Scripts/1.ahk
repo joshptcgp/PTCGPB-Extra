@@ -275,7 +275,7 @@ if(DeadCheck = 1){
             ;                         just to get around the checking for a level after opening a pack. This change is made based on the
             ;                         5p-no delete community mod created by DietPepperPhD in the discord server.
 
-            if(deleteMethod != "5 Pack (Fast)" || deleteMethod != "13 Pack") {
+            if(deleteMethod != "5 Pack (Fast)" && deleteMethod != "13 Pack") {
                 friendsAdded := AddFriends(true)
             } else {
                 FindImageAndClick(120, 500, 155, 530, , "Social", 143, 518, 500)
@@ -295,7 +295,7 @@ if(DeadCheck = 1){
             }
         }
 
-        ; -- Do 13 pack --
+        ; -- Do more pack --
         if(deleteMethod = "13 Pack") {
         HomeAndMission()
         SelectPack("HGPack")
@@ -320,10 +320,10 @@ if(DeadCheck = 1){
         PackOpening() ;13
 
         }
-        ; -- end of 13 packs
+        ; -- end of more packs
 
 
-        if (nukeAccount && !keepAccount && !injectMethod) {
+        if ((nukeAccount && !keepAccount && !injectMethod)) {
             CreateStatusMessage("Deleting account...",,,, false)
             menuDelete()
         } else if (friended) {
@@ -360,6 +360,7 @@ if(DeadCheck = 1){
         LogToFile("Packs: " . packs . " | Total time: " . mminutes . "m " . sseconds . "s | Avg: " . minutes . "m " . seconds . "s | Runs: " . rerolls)
 
         if ((!injectMethod || !loadedAccount) && (!nukeAccount || keepAccount)) {
+            MsgBox, removethis 2
             ; Doing the following because:
             ; - not using the inject method
             ; - or using the inject method but an hasn't been loaded
@@ -676,7 +677,7 @@ AddFriends(renew := false, getFC := false) {
                             }
                             break
                         }
-                        Sleep, 750
+                        Sleep, 100 ; Check at higher frequency
                         failSafeTime := (A_TickCount - failSafe) // 1000
                         CreateStatusMessage("Waiting for AddFriends4`n(" . failSafeTime . "/45 seconds)")
                     }
@@ -711,15 +712,14 @@ ChooseTag() {
 
 EraseInput(num := 0, total := 0) {
     if(num)
-        CreateStatusMessage("Removing friend ID " . num . "/" . total,,,, false)
+        CreateStatusMessage("Removing friend id " . num . "/" . total,,,, false)
     failSafe := A_TickCount
     failSafeTime := 0
     Loop {
         FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
-        Loop 20 {
-            adbInputEvent("67")
-            ; Sleep, 10 ; Remove sleep to speed up input
-        }
+        adbClick(50, 500)
+        adbClick(50, 500)
+        adbInputEvent("67")
         if(FindOrLoseImage(15, 500, 68, 520, , "Erase", 0, failSafeTime))
             break
     }
@@ -1264,7 +1264,7 @@ CheckPack() {
     ; SquallTCGP 2025.03.12 - Just checking the packs count and setting them to 0 if it's number of packs is 3.
     ;                         This applies to any Delete Method except 5 Pack (Fast). This change is made based
     ;                         on the 5p-no delete community mod created by DietPepperPhD in the discord server.
-    if (deleteMethod != "5 Pack (Fast)" || deleteMethod != "13 Pack") {
+    if (deleteMethod != "5 Pack (Fast)" && deleteMethod != "13 Pack") {
         if (packs = 3)
             packs := 0
     }
