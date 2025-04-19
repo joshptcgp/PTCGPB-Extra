@@ -595,7 +595,7 @@ AddFriends(renew := false, getFC := false) {
                         }
                         break
                     }
-                    Sleep, 750
+                    Sleep, 100 ; Check at higher frequency
                     failSafeTime := (A_TickCount - failSafe) // 1000
                     CreateStatusMessage("Waiting for AddFriends2`n(" . failSafeTime . "/45 seconds)")
                 }
@@ -695,7 +695,7 @@ EraseInput(num := 0, total := 0) {
         FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
         Loop 20 {
             adbInputEvent("67")
-            Sleep, 10
+            ; Sleep, 10 ; Remove sleep to speed up input
         }
         if(FindOrLoseImage(15, 500, 68, 520, , "Erase", 0, failSafeTime))
             break
