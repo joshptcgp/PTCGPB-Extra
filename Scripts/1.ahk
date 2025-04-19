@@ -19,7 +19,7 @@ DllCall("AllocConsole")
 WinHide % "ahk_id " DllCall("GetConsoleWindow", "ptr")
 
 global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, scriptName, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, Mains, showStatus, injectMethod, packMethod, loadDir, loadedAccount, nukeAccount, CheckShiningPackOnly, TrainerCheck, FullArtCheck, RainbowCheck, ShinyCheck, dateChange, foundGP, friendsAdded, minStars, PseudoGodPack, Palkia, Dialga, Mew, Pikachu, Charizard, Mewtwo, packArray, CrownCheck, ImmersiveCheck, InvalidCheck, slowMotion, screenShot, accountFile, invalid, starCount, keepAccount, minStarsA1Charizard, minStarsA1Mewtwo, minStarsA1Pikachu, minStarsA1a, minStarsA2Dialga, minStarsA2Palkia, minStarsA2a, minStarsA2b
-global DeadCheck
+global DeadCheck, aliasSuffix
 
 scriptName := StrReplace(A_ScriptName, ".ahk")
 winTitle := scriptName
@@ -66,6 +66,7 @@ IniRead, Mewtwo, %A_ScriptDir%\..\Settings.ini, UserSettings, Mewtwo, 0
 IniRead, slowMotion, %A_ScriptDir%\..\Settings.ini, UserSettings, slowMotion, 0
 IniRead, DeadCheck, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck, 0
 IniRead, ocrLanguage, %A_ScriptDir%\..\Settings.ini, UserSettings, ocrLanguage, en
+IniRead, aliasSuffix, %A_ScriptDir%\..\Settings.ini, UserSettings, aliasSuffix, ""
 
 IniRead, minStarsA1Charizard, %A_ScriptDir%\..\Settings.ini, UserSettings, minStarsA1Charizard, 0
 IniRead, minStarsA1Mewtwo, %A_ScriptDir%\..\Settings.ini, UserSettings, minStarsA1Mewtwo, 0
@@ -2009,6 +2010,7 @@ Delay(n) {
 }
 
 DoTutorial() {
+    global aliasSuffix
     FindImageAndClick(105, 396, 121, 406, , "Country", 143, 370) ;select month and year and click
 
     Delay(1)
@@ -2190,9 +2192,26 @@ DoTutorial() {
         else
             name := ReadFile("usernames_default")
 
-        Random, randomIndex, 1, name.MaxIndex()
-        username := name[randomIndex]
-        username := SubStr(username, 1, 14)  ;max character limit
+        if (aliasSuffix != "ERROR" && aliasSuffix != "") {
+            ; Clean alias suffix to only allow English characters
+            aliasSuffix := RegExReplace(aliasSuffix, "[^a-zA-Z]")
+            if (aliasSuffix != "") {
+                ; Generate random 4 digits
+                Random, randomNum, 1000, 9999
+                username := aliasSuffix . randomNum
+            } else {
+                ; If alias suffix is empty after cleaning, use default username logic
+                Random, randomIndex, 1, name.MaxIndex()
+                username := name[randomIndex]
+                username := SubStr(username, 1, 14)  ;max character limit
+            }
+        } else {
+            ; Use default username logic
+            Random, randomIndex, 1, name.MaxIndex()
+            username := name[randomIndex]
+            username := SubStr(username, 1, 14)  ;max character limit
+        }
+
         adbInput(username)
         Delay(1)
         if(FindImageAndClick(121, 490, 161, 520, , "Return", 185, 372, , 10)) ;click through until return button on open pack

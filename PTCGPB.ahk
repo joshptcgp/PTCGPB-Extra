@@ -110,6 +110,7 @@ IniRead, heartBeatDelay, Settings.ini, UserSettings, heartBeatDelay, 30
 IniRead, sendAccountXml, Settings.ini, UserSettings, sendAccountXml, 0
 IniRead, autoLaunchControlPanel, Settings.ini, UserSettings, autoLaunchControlPanel, 0
 IniRead, gpFourOnly, Settings.ini, UserSettings, gpFourOnly, 0
+IniRead, aliasSuffix, Settings.ini, UserSettings, aliasSuffix, ""
 
 ; Create a stylish GUI with custom colors and modern look
 Gui, Color, 1E1E1E, 333333 ; Dark theme background
@@ -293,7 +294,7 @@ Gui, Add, Checkbox, % (gpFourOnly ? "Checked" : "") " vgpFourOnly x520 y175 " . 
 ; ============ Tabs ============
 ; ==============================
 sectionColor := "cWhite"
-Gui, Add, Tab3, x255 y315 w490 h200, Download Settings|GP Discord|Heartbeat Discord|Removed
+Gui, Add, Tab3, x255 y315 w490 h200, Download Settings|GP Discord|Heartbeat Discord|Convenience
 
 ; Download Settings
 Gui, Tab, 1
@@ -346,11 +347,8 @@ Gui, Add, Edit, % (!heartBeat ? "Hidden " : "") . "vheartBeatWebhookURL y+5 w460
 Gui, Tab, 4
 sectionColor := "cFFA500" ; Orange
 
-Gui, Add, Text, x270 y350 %sectionColor%, Discord ID:
-Gui, Add, Edit, vs4tDiscordUserId w460 h20 y+5 -E0x200 Background2A2A2A cWhite, %s4tDiscordUserId%
-Gui, Add, Text, y+5 %sectionColor%, Webhook URL:
-Gui, Add, Edit, vs4tDiscordWebhookURL w460 h20 y+5 -E0x200 Background2A2A2A cWhite, %s4tDiscordWebhookURL%
-Gui, Add, Checkbox, % (s4tSendAccountXml ? "Checked" : "") " vs4tSendAccountXml y+7 " . sectionColor, Send Account XML
+Gui, Add, Text, x270 y350 %sectionColor%, Alias Suffix (English chars only):
+Gui, Add, Edit, valiasSuffix w460 h20 y+5 -E0x200 Background2A2A2A cWhite, %aliasSuffix%
 
 ; End tabs
 Gui, Tab
@@ -529,6 +527,7 @@ SaveReload:
     IniWrite, %instanceLaunchDelay%, Settings.ini, UserSettings, instanceLaunchDelay
     IniWrite, %autoLaunchControlPanel%, Settings.ini, UserSettings, autoLaunchControlPanel
     IniWrite, %gpFourOnly%, Settings.ini, UserSettings, gpFourOnly
+    IniWrite, %aliasSuffix%, Settings.ini, UserSettings, aliasSuffix
 
     minStarsA1Charizard := minStars
     minStarsA1Mewtwo := minStars
@@ -611,6 +610,7 @@ Start:
     IniWrite, %instanceLaunchDelay%, Settings.ini, UserSettings, instanceLaunchDelay
     IniWrite, %autoLaunchControlPanel%, Settings.ini, UserSettings, autoLaunchControlPanel
     IniWrite, %gpFourOnly%, Settings.ini, UserSettings, gpFourOnly
+    IniWrite, %aliasSuffix%, Settings.ini, UserSettings, aliasSuffix
 
     minStarsA1Charizard := minStars
     minStarsA1Mewtwo := minStars
