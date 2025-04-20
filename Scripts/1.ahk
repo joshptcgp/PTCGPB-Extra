@@ -67,6 +67,7 @@ IniRead, slowMotion, %A_ScriptDir%\..\Settings.ini, UserSettings, slowMotion, 0
 IniRead, DeadCheck, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck, 0
 IniRead, ocrLanguage, %A_ScriptDir%\..\Settings.ini, UserSettings, ocrLanguage, en
 IniRead, aliasSuffix, %A_ScriptDir%\..\Settings.ini, UserSettings, aliasSuffix
+IniRead, generateAccountsOnly, %A_ScriptDir%\..\Settings.ini, UserSettings, generateAccountsOnly, 0
 
 IniRead, minStarsA1Charizard, %A_ScriptDir%\..\Settings.ini, UserSettings, minStarsA1Charizard, 0
 IniRead, minStarsA1Mewtwo, %A_ScriptDir%\..\Settings.ini, UserSettings, minStarsA1Mewtwo, 0
@@ -179,6 +180,11 @@ if(injectMethod) {
     nukeAccount := false
 }
 
+; Save the account if generateAccountsOnly is true
+if (generateAccountsOnly){
+    nukeAccount := false
+}
+
 if(!injectMethod || !loadedAccount)
     restartGameInstance("Initializing bot...", false)
 
@@ -251,8 +257,10 @@ if(DeadCheck = 1){
             if(!loadedAccount)
                 wonderPicked := DoWonderPick()
 
-        ; Add friends
-        friendsAdded := AddFriends()
+        if (!generateAccountsOnly) {
+            friendsAdded := AddFriends()
+        }
+
         ; Opening pack 1
         SelectPack("First")
         PackOpening()
@@ -361,7 +369,6 @@ if(DeadCheck = 1){
         LogToFile("Packs: " . packs . " | Total time: " . mminutes . "m " . sseconds . "s | Avg: " . minutes . "m " . seconds . "s | Runs: " . rerolls)
 
         if ((!injectMethod || !loadedAccount) && (!nukeAccount || keepAccount)) {
-            MsgBox, removethis 2
             ; Doing the following because:
             ; - not using the inject method
             ; - or using the inject method but an hasn't been loaded
@@ -1075,7 +1082,22 @@ resetWindows(){
 }
 
 restartGameInstance(reason, RL := true){
-    AppendToJsonFile(packs)
+    global generateAccountsOnly
+
+    ; Don't record failed packs if generating accounts only.
+    if (!generateAccountsOnly) {
+        AppendToJsonFile(packs)
+        saveAccount("All")
+        adbShell.StdIn.WriteLine("am force-stop jp.pokemon.pokemontcgp")
+        waitadb()
+        adbShell.StdIn.WriteLine("rm /data/data/jp.pokemon.pokemontcgp/shared_prefs/deviceAccount:.xml") ; delete account data
+        waitadb()
+        adbShell.StdIn.WriteLine("am start -n jp.pokemon.pokemontcgp/com.unity3d.player.UnityPlayerActivity")
+        waitadb()
+        LogToFile("Restarted instance " . scriptName . " | Acc Gen: " . packs . " | Reason: " reason, "Restart.txt")
+        Sleep, 5000
+        Reload
+    }
 
     if (Debug)
         CreateStatusMessage("Restarting game reason:`n" . reason)
@@ -1108,7 +1130,9 @@ restartGameInstance(reason, RL := true){
                 ; Logging to Discord is temporarily disabled until all of the scenarios which could cause the script to end up here are fully understood.
                 ;LogToDiscord(logMessage,, true)
             }
-            LogToFile("Restarted game for instance " . scriptName . ". Reason: " reason, "Restart.txt")
+            if (!packs)
+                packs := 0
+            LogToFile("Restarted instance " . scriptName . " | Packs: " . packs . " | Reason: " reason, "Restart.txt")
 
             Reload
         }
@@ -1362,13 +1386,21 @@ CheckPack() {
 }
 
 FoundStars(star) {
-    global scriptName, DeadCheck, ocrLanguage, injectMethod, openPack
+    global scriptName, DeadCheck, ocrLanguage, injectMethod, openPack, generateAccountsOnly
 
     ; Not dead.
     IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
 
     ; Keep account.
     keepAccount := true
+
+    ; If generating accounts only, don't send discord message and doesnt need to unfried
+    if (generateAccountsOnly){
+        screenShot := Screenshot(star)
+        accountFullPath := ""
+        accountFile := saveAccount(star, accountFullPath)
+        return
+    }
 
     screenShot := Screenshot(star)
     accountFullPath := ""
@@ -1498,6 +1530,7 @@ FindCard(prefix) {
 }
 
 FindGodPack(invalidPack := false) {
+    global generateAccountsOnly
     ; Check for normal borders.
     normalBorders := FindBorders("normal")
     if (normalBorders) {
@@ -1538,8 +1571,10 @@ FindGodPack(invalidPack := false) {
 
     if (invalidPack) {
         GodPackFound("Invalid")
-
-        RemoveFriends()
+        
+        if(!generateAccountsOnly){
+            RemoveFriends()
+        }
         IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
     } else {
         GodPackFound("Valid")
@@ -1549,9 +1584,16 @@ FindGodPack(invalidPack := false) {
 }
 
 GodPackFound(validity) {
-    global scriptName, DeadCheck, ocrLanguage, injectMethod, openPack
+    global scriptName, DeadCheck, ocrLanguage, injectMethod, openPack, generateAccountsOnly
 
     IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
+
+    if (generateAccountsOnly){
+        screenShot := Screenshot(validity)
+        accountFullPath := ""
+        accountFile := saveAccount(validity, accountFullPath)
+        return
+    }
 
     if(validity = "Valid") {
         Praise := ["Congrats!", "Congratulations!", "GG!", "Whoa!", "Praise Helix! ༼ つ ◕_◕ ༽つ", "Way to go!", "You did it!", "Awesome!", "Nice!", "Cool!", "You deserve it!", "Keep going!", "This one has to be live!", "No duds, no duds, no duds!", "Fantastic!", "Bravo!", "Excellent work!", "Impressive!", "You're amazing!", "Well done!", "You're crushing it!", "Keep up the great work!", "You're unstoppable!", "Exceptional!", "You nailed it!", "Hats off to you!", "Sweet!", "Kudos!", "Phenomenal!", "Boom! Nailed it!", "Marvelous!", "Outstanding!", "Legendary!", "Youre a rock star!", "Unbelievable!", "Keep shining!", "Way to crush it!", "You're on fire!", "Killing it!", "Top-notch!", "Superb!", "Epic!", "Cheers to you!", "Thats the spirit!", "Magnificent!", "Youre a natural!", "Gold star for you!", "You crushed it!", "Incredible!", "Shazam!", "You're a genius!", "Top-tier effort!", "This is your moment!", "Powerful stuff!", "Wicked awesome!", "Props to you!", "Big win!", "Yesss!", "Champion vibes!", "Spectacular!"]

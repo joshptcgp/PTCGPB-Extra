@@ -116,6 +116,7 @@ IniRead, gpFourOnly, Settings.ini, UserSettings, gpFourOnly, 0
 IniRead, aliasSuffix, Settings.ini, UserSettings, aliasSuffix
 IniRead, webhookForPPH, Settings.ini, UserSettings, webhookForPPH
 IniRead, pphAlertThreshold, Settings.ini, UserSettings, pphAlertThreshold, 0
+IniRead, generateAccountsOnly, Settings.ini, UserSettings, generateAccountsOnly, 0
 
 ; Create a stylish GUI with custom colors and modern look
 Gui, Color, 1E1E1E, 333333 ; Dark theme background
@@ -288,11 +289,12 @@ Gui, Add, DropDownList, vdeleteMethod gdeleteSettings choose%defaultDelete% x575
 Gui, Add, Checkbox, % (packMethod ? "Checked" : "") " vpackMethod x520 y80 " . sectionColor, 1 Pack Method
 Gui, Add, Checkbox, % (nukeAccount ? "Checked" : "") " vnukeAccount x520 y100 " . sectionColor, Menu Delete Account
 
-; ========== Save For Trade Settings Section ==========
+; ========== Misc Settings Section ==========
 sectionColor := "cFFA500" ; Orange
 Gui, Add, GroupBox, x505 y130 w240 h175 %sectionColor%, Misc Settings
 Gui, Add, Checkbox, % (autoLaunchControlPanel ? "Checked" : "") " vautoLaunchControlPanel x520 y155 " . sectionColor, Auto Launch Control Panel
 Gui, Add, Checkbox, % (gpFourOnly ? "Checked" : "") " vgpFourOnly x520 y175 " . sectionColor, [GPTest] Only Four 2* Above
+Gui, Add, Checkbox, % (generateAccountsOnly ? "Checked" : "") " vgenerateAccountsOnly x520 y195 " . sectionColor, [Beta] Generate Accounts Only
 
 
 
@@ -368,11 +370,11 @@ Gui, Tab
 
 ; ========== Action Buttons ==========
 Gui, Add, Button, gOpenLink x5 y522 w117, Buy Me a Coffee
-Gui, Add, Button, gOpenGithub x+7 w117, Check Releases
+Gui, Add, Button, gOpenGithub x+7 w117, Check Updates
 Gui, Add, Button, gArrangeWindows x+7 w118, Arrange Windows
 Gui, Add, Button, gLaunchAllMumu x+7 w118, Launch All Mumu
 Gui, Add, Button, gSaveReload x+7 w117, Save and Reload
-Gui, Add, Button, gCheckForUpdates x+7 w117, Check Updates
+Gui, Add, Button, gCheckForUpdates x+7 w117, Report Bug
 Gui, Add, Button, gStart x5 y+7 w740, START BOT
 
 Gui, Show, , %localVersion% PTCGPB-Extra Bot Setup [Non-Commercial 4.0 International License]
@@ -381,7 +383,7 @@ Return
 
 
 CheckForUpdates:
-    CheckForUpdate()
+    Run, https://github.com/joshptcgp/PTCGPB-Extra/issues
 return
 
 mainSettings:
@@ -541,6 +543,7 @@ SaveReload:
     IniWrite, %aliasSuffix%, Settings.ini, UserSettings, aliasSuffix
     IniWrite, %webhookForPPH%, Settings.ini, UserSettings, webhookForPPH
     IniWrite, %pphAlertThreshold%, Settings.ini, UserSettings, pphAlertThreshold
+    IniWrite, %generateAccountsOnly%, Settings.ini, UserSettings, generateAccountsOnly
 
     minStarsA1Charizard := minStars
     minStarsA1Mewtwo := minStars
@@ -626,6 +629,7 @@ Start:
     IniWrite, %aliasSuffix%, Settings.ini, UserSettings, aliasSuffix
     IniWrite, %webhookForPPH%, Settings.ini, UserSettings, webhookForPPH
     IniWrite, %pphAlertThreshold%, Settings.ini, UserSettings, pphAlertThreshold
+    IniWrite, %generateAccountsOnly%, Settings.ini, UserSettings, generateAccountsOnly
 
     minStarsA1Charizard := minStars
     minStarsA1Mewtwo := minStars
@@ -646,6 +650,31 @@ Start:
 
     IniWrite, %heartBeatDelay%, Settings.ini, UserSettings, heartBeatDelay
     IniWrite, %sendAccountXml%, Settings.ini, UserSettings, sendAccountXml
+
+    ; Check if Generate Accounts Only is enabled and show confirmation
+    if (generateAccountsOnly) {
+        MsgBox, 4, Generate Accounts Only, You have selected to generate accounts only, this will generate and save accounts but will not add friends, is that what you intended? (Press no to cancel)
+        IfMsgBox, No
+        {
+            IniWrite, 0, Settings.ini, UserSettings, generateAccountsOnly
+            Reload
+            return
+        }
+        IfMsgBox, Yes
+        {
+            MsgBox, This is a beta feature, packs count are equal to account generated, if you keep getting stuck try using 5pack fast method.
+        }
+    }
+
+    pID := checkInstance(1)
+    if (!pID) {
+        MsgBox, 4, No instances found, Looks like you haven't started MuMu instances yet, would you like to continue?
+        IfMsgBox, No
+        {
+            Reload
+            return
+        }
+    }
 
     ; Using FriendID field to provide a URL to download ids.txt is deprecated.
     if (inStr(FriendID, "http")) {
@@ -799,9 +828,11 @@ Start:
         ; Display pack status at the bottom of the first reroll instance
         DisplayPackStatus(packStatus, ((runMain ? Mains * scaleParam : 0) + 5), 490)
 
+        if (generateAccountsOnly)
+            continue
 
 
-        if(heartBeat && Instances > 0) {
+        if(heartBeat && Instances != 0) {
             if((A_Index = 1 || (Mod(A_Index, (heartBeatDelay // 0.5)) = 0))) {
                 onlineAHK := ""
                 offlineAHK := ""
@@ -1278,6 +1309,15 @@ ReadFile(filename, numbers := false) {
     }
 
     return values.MaxIndex() ? values : false
+}
+
+checkInstance(instanceNum := "") {
+    ret := WinExist(instanceNum)
+    if(ret) {
+        WinGet, temp_pid, PID, ahk_id %ret%
+        return temp_pid
+    }
+    return ""
 }
 
 ~+F7::ExitApp
