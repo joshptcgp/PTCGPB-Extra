@@ -12,5 +12,14 @@ This is an opinionated fork of [Arturo's PTCGPB](https://github.com/Arturo-1212/
 - 🤖 Alias Generator for botting account usernames
 - ⚠️ Low Pack Per Hours Alert via Webhook
 
+## **__TODO__**
+
+- Further optimize efficiency by reducing wait times and unnecessary steps
+- Add recovery feature for stuck instances instead of restarting
+- Improve pack counting accuracy, especially for stuck instances
+- Identify and resolve potential stuck points to reduce fail rate
+- Add support for more notification platforms (Telegram/ntfy)
+- Create persistent ADB shell sessions to reduce overhead
+
 ## License
 This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0).
