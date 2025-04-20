@@ -14,19 +14,14 @@ IniRead, Instances, Settings.ini, UserSettings, Instances, 1
 IniRead, runMain, Settings.ini, UserSettings, runMain, 1
 IniRead, Mains, Settings.ini, UserSettings, Mains, 1
 IniRead, folderPath, Settings.ini, UserSettings, folderPath, C:\Program Files\Netease
-IniRead, useChinaVersion, Settings.ini, UserSettings, useChinaVersion, 0
 
 ; Set MuMu folder path based on version
-if (useChinaVersion) {
+mumuFolder = %folderPath%\MuMuPlayerGlobal-12.0
+if !FileExist(mumuFolder)
     mumuFolder = %folderPath%\MuMu Player 12
-} else {
-    mumuFolder = %folderPath%\MuMuPlayerGlobal-12.0
-    if !FileExist(mumuFolder)
-        mumuFolder = %folderPath%\MuMu Player 12
-}
 
 ; Set MuMuManager.exe location
-mumuManagerPath := mumuFolder "\shell\MuMuManager.exe"
+mumuManagerPath := folderPath . "\MuMuPlayerGlobal-12.0\shell\MuMuManager.exe"
 
 ; Monokai theme colors
 global monokaiBg := "272822"      ; Dark background
@@ -105,6 +100,10 @@ return
 
 ; Functions for killing MuMu instances
 KillAllMumu:
+    MsgBox, 4,, Shutting down takes about 5 seconds per instance, is that ok?
+    IfMsgBox No
+        return
+        
     Loop %Instances% {
         killInstance(A_Index)
     }
@@ -114,61 +113,50 @@ KillAllMumu:
             killInstance(mainInstanceName)
         }
     }
-    Gosub, UpdateStatus
-return
-
-KillMumu1:
-    killInstance(1)
-    Gosub, UpdateStatus
-return
-
-KillMumu2:
-    killInstance(2)
-    Gosub, UpdateStatus
-return
-
-KillMumu3:
-    killInstance(3)
-    Gosub, UpdateStatus
-return
-
-KillMumu4:
-    killInstance(4)
-    Gosub, UpdateStatus
-return
-
-KillMumu5:
-    killInstance(5)
-    Gosub, UpdateStatus
-return
-
-KillMumu6:
-    killInstance(6)
+    MsgBox, All instances have been shutdown.
     Gosub, UpdateStatus
 return
 
 ; Functions for cleaning disk cache
 CleanDisk1:
+    MsgBox, 4,, Cleaning disk cache will close instance, is that ok?
+    IfMsgBox No
+        return
     cleanInstanceDisk(1)
 return
 
 CleanDisk2:
+    MsgBox, 4,, Cleaning disk cache will close instance, is that ok?
+    IfMsgBox No
+        return
     cleanInstanceDisk(2)
 return
 
 CleanDisk3:
+    MsgBox, 4,, Cleaning disk cache will close instance, is that ok?
+    IfMsgBox No
+        return
     cleanInstanceDisk(3)
 return
 
 CleanDisk4:
+    MsgBox, 4,, Cleaning disk cache will close instance, is that ok?
+    IfMsgBox No
+        return
     cleanInstanceDisk(4)
 return
 
 CleanDisk5:
+    MsgBox, 4,, Cleaning disk cache will close instance, is that ok?
+    IfMsgBox No
+        return
     cleanInstanceDisk(5)
 return
 
 CleanDisk6:
+    MsgBox, 4,, Cleaning disk cache will close instance, is that ok?
+    IfMsgBox No
+        return
     cleanInstanceDisk(6)
 return
 
@@ -238,6 +226,7 @@ TogglePTCGPB:
     } else {
         ; Launch the script
         Run, %A_ScriptDir%\PTCGPB.ahk
+        Sleep, 500
         GuiControl,, TogglePTCGPB, Toggle PTCGPB.ahk *
     }
     Gosub, UpdateStatus
@@ -372,29 +361,16 @@ OpenLogsFolder:
 return
 
 ToggleMonitor:
-    ; Check if Monitor.ahk is running
-    monitorRunning := false
-    DetectHiddenWindows, On
-    WinGet, IDList, List, ahk_class AutoHotkey
-    Loop %IDList% {
-        ID:=IDList%A_Index%
-        WinGetTitle, ATitle, ahk_id %ID%
-        if InStr(ATitle, "\Monitor.ahk") {
-            monitorRunning := true
-            break
-        }
-    }
     
-    if (monitorRunning) {
+    if (checkAHK("Monitor.ahk")) {
         ; Kill Monitor.ahk
         killAHK("Monitor.ahk")
         GuiControl,, ToggleMonitor, Toggle Monitor.ahk
-        MsgBox, 64, Monitor Status, Monitor has been turned OFF.
     } else {
         ; Launch Monitor.ahk
         Run, %A_ScriptDir%\Monitor.ahk
+        Sleep, 500
         GuiControl,, ToggleMonitor, Toggle Monitor.ahk *
-        MsgBox, 64, Monitor Status, Monitor has been turned ON.
     }
     
     Gosub, UpdateStatus
@@ -452,19 +428,26 @@ killInstance(instanceNum := "") {
     
     ; If we found a valid MuMu instance number, try to shut it down properly using MuMuManager
     if (mumuNum != "") {
+
+        ; If instance is already closed or not running, return
+        pID := checkInstance(instanceNum)
+        if (!pID) {
+            return killed
+        }
+
         ; Run the MuMuManager command to properly shut down the instance
         RunWait, %mumuManagerPath% api -v %mumuNum% shutdown_player,, Hide
         
-        ; Wait a moment for the processes to terminate
-        Sleep, 5000
-        
-        ; Check if the instance is still running
-        pID := checkInstance(instanceNum)
-        if (!pID) {
-            ; Instance was successfully shut down
-            killed := 1
-            LogToFile("Properly shut down instance " . instanceNum . " using MuMuManager", "ControlPanel.txt")
-            return killed
+        ; Check every second for up to 5 seconds if instance is terminated
+        Loop, 5 {
+            Sleep, 1000
+            pID := checkInstance(instanceNum)
+            if (!pID) {
+                ; Instance was successfully shut down
+                killed := 1
+                LogToFile("Properly shut down instance " . instanceNum . " using MuMuManager", "ControlPanel.txt")
+                return killed
+            }
         }
     }
     
@@ -512,6 +495,9 @@ checkInstance(instanceNum := "") {
 cleanInstanceDisk(instanceNum) {
     global mumuFolder
     
+    ; We need to kill the instance to be able to delete the cache disk
+    killInstance(instanceNum)
+    Sleep, 1000
     ; Get the mumu instance number for this script
     mumuNum := getMumuInstanceNumFromPlayerName(instanceNum)
     if (mumuNum != "") {
@@ -603,21 +589,33 @@ toggleInstance(instanceNum, buttonVar) {
         GuiControl,, %buttonVar%, %instanceNum%
     } else {
         ; Launch the instance
-        Run, %mumuManagerPath% api -v %instanceNum% launch_player,, Hide
+        launchInstance(instanceNum)
+        Sleep, 3000
         GuiControl,, %buttonVar%, %instanceNum% *
     }
     Gosub, UpdateStatus
+}
+
+; Function to launch a MuMu instance
+launchInstance(instanceNum := "") {
+    global mumuFolder
+
+    if(instanceNum != "") {
+        mumuNum := getMumuInstanceNumFromPlayerName(instanceNum)
+        if(mumuNum != "") {
+            Run_(mumuFolder . "\shell\MuMuPlayer.exe", "-v " . mumuNum)
+        }
+    }
 }
 
 ; Helper function to toggle an AHK script
 toggleAHK(scriptName, buttonVar) {
     if (checkAHK(scriptName)) {
         killAHK(scriptName)
-        GuiControl,, %buttonVar%, % SubStr(scriptName, 1, InStr(scriptName, ".") - 1)
     } else {
         ; Launch the script
-        Run, %A_ScriptDir%\%scriptName%
-        GuiControl,, %buttonVar%, % SubStr(scriptName, 1, InStr(scriptName, ".") - 1) " *"
+        Run, %A_ScriptDir%\Scripts\%scriptName%
+        Sleep, 500
     }
     Gosub, UpdateStatus
 }
@@ -704,4 +702,46 @@ SumVariablesInJsonFile() {
     }
 
     return sum
+}
+
+; Function to run as a NON-administrator, since MuMu has issues if run as Administrator
+Run_(target, args:="", workdir:="") {
+    try
+        ShellRun(target, args, workdir)
+    catch e
+        Run % args="" ? target : target " " args, % workdir
+}
+
+ShellRun(prms*)
+{
+    shellWindows := ComObjCreate("Shell.Application").Windows
+    VarSetCapacity(_hwnd, 4, 0)
+    desktop := shellWindows.FindWindowSW(0, "", 8, ComObj(0x4003, &_hwnd), 1)
+   
+    ; Retrieve top-level browser object.
+    if ptlb := ComObjQuery(desktop
+        , "{4C96BE40-915C-11CF-99D3-00AA004AE837}"  ; SID_STopLevelBrowser
+        , "{000214E2-0000-0000-C000-000000000046}") ; IID_IShellBrowser
+    {
+        ; IShellBrowser.QueryActiveShellView -> IShellView
+        if DllCall(NumGet(NumGet(ptlb+0)+15*A_PtrSize), "ptr", ptlb, "ptr*", psv:=0) = 0
+        {
+            ; Define IID_IDispatch.
+            VarSetCapacity(IID_IDispatch, 16)
+            NumPut(0x46000000000000C0, NumPut(0x20400, IID_IDispatch, "int64"), "int64")
+           
+            ; IShellView.GetItemObject -> IDispatch (object which implements IShellFolderViewDual)
+            DllCall(NumGet(NumGet(psv+0)+15*A_PtrSize), "ptr", psv
+                , "uint", 0, "ptr", &IID_IDispatch, "ptr*", pdisp:=0)
+           
+            ; Get Shell object.
+            shell := ComObj(9,pdisp,1).Application
+           
+            ; IShellDispatch2.ShellExecute
+            shell.ShellExecute(prms*)
+           
+            ObjRelease(psv)
+        }
+        ObjRelease(ptlb)
+    }
 } 
