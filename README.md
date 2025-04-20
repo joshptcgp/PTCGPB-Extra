@@ -9,6 +9,7 @@ This is an opinionated fork of [Arturo's PTCGPB](https://github.com/Arturo-1212/
 
 ## **__What's New?__** 🚀
 
+- 🔮 13 Pack method ported
 - ⚡ Faster friend adding process for group efficiency
 - 🎯 GP Test filter option: Only keeps God Packs with 4+ Double 2 Stars Cards
 - 🎮 Added Control panel for better management / Killing stuck instances / Better Statistics
