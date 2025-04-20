@@ -1,5 +1,10 @@
 # **__PTCGPB-Extra: Optimized For Group Rerolling__** ⚡
 
+<div align="center">
+  <img src="https://i.imgur.com/5ed3Z2d.png" alt="PTCGPB-Extra Running Screenshot">
+  <p><em>PTCGPB-Extra in action</em></p>
+</div>
+
 This is an opinionated fork of [Arturo's PTCGPB](https://github.com/Arturo-1212/PTCGPB) optimized for group rerolling scenarios, everything unrelated for group rerolling are either removed or untouched.
 
 ## **__What's New?__** 🚀
