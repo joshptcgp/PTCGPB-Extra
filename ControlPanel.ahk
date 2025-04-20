@@ -85,9 +85,14 @@ Gui, Add, Button, x20 y610 w280 h20 gRefreshStatus Background%monokaiButton% c%m
 Gui, Add, GroupBox, x320 y10 w200 h200 c%monokaiAccent% Background%monokaiGroup%, Utilities
 Gui, Add, Button, x330 y30 w180 h30 gOpenProjectFolder Background%monokaiButton% c%monokaiText%, Open Project Folder
 Gui, Add, Button, x330 y65 w180 h30 gOpenLogsFolder Background%monokaiButton% c%monokaiText%, Open Logs Folder
-Gui, Add, Button, x330 y100 w180 h30 gToggleMonitor Background%monokaiButton% c%monokaiText%, Toggle Monitor.ahk
-Gui, Add, Button, x330 y135 w180 h30 gTogglePTCGPB Background%monokaiButton% c%monokaiText%, Toggle PTCGPB.ahk
+Gui, Add, Button, x330 y100 w180 h30 gToggleMonitor Background%monokaiButton% c%monokaiText% vToggleMonitor, Toggle Monitor.ahk
+Gui, Add, Button, x330 y135 w180 h30 gTogglePTCGPB Background%monokaiButton% c%monokaiText% vTogglePTCGPB, Toggle PTCGPB.ahk
 Gui, Add, Button, x330 y170 w180 h30 gCheckUpdate Background%monokaiButton% c%monokaiText%, Check For Updates
+
+; Stats Section
+Gui, Add, GroupBox, x320 y220 w200 h160 c%monokaiAccent% Background%monokaiGroup%, Statistics
+Gui, Add, Text, x330 y240 w180 h90 vStatsText c%monokaiText%, Loading stats...
+Gui, Add, Button, x330 y350 w180 h20 gRefreshStats Background%monokaiButton% c%monokaiText%, Refresh Stats
 
 ; Show GUI
 Gui, Show, w530 h650, PTCGP-Extra Control Panel by Josh
@@ -95,6 +100,7 @@ Gui, Show, w530 h650, PTCGP-Extra Control Panel by Josh
 ; Initial status check
 SetTimer, UpdateStatus, 5000
 Gosub, UpdateStatus
+Gosub, UpdateStats
 return
 
 ; Functions for killing MuMu instances
@@ -226,7 +232,15 @@ ToggleMainInstance:
 return
 
 TogglePTCGPB:
-    toggleAHK("PTCGPB.ahk", "PTCGPBBtn")
+    if (checkAHK("PTCGPB.ahk")) {
+        killAHK("PTCGPB.ahk")
+        GuiControl,, TogglePTCGPB, Toggle PTCGPB.ahk
+    } else {
+        ; Launch the script
+        Run, %A_ScriptDir%\PTCGPB.ahk
+        GuiControl,, TogglePTCGPB, Toggle PTCGPB.ahk *
+    }
+    Gosub, UpdateStatus
 return
 
 ; Functions for killing AHK scripts
@@ -288,6 +302,7 @@ return
 
 RefreshStatus:
     Gosub, UpdateStatus
+    Gosub, UpdateStats
 return
 
 UpdateStatus:
@@ -331,11 +346,17 @@ UpdateStatus:
     ; Check Monitor.ahk
     if (checkAHK("Monitor.ahk")) {
         status .= "Monitor.ahk, "
+        GuiControl,, ToggleMonitor, Toggle Monitor.ahk *
+    } else {
+        GuiControl,, ToggleMonitor, Toggle Monitor.ahk
     }
     
     ; Check PTCGPB.ahk
     if (checkAHK("PTCGPB.ahk")) {
         status .= "PTCGPB.ahk, "
+        GuiControl,, TogglePTCGPB, Toggle PTCGPB.ahk *
+    } else {
+        GuiControl,, TogglePTCGPB, Toggle PTCGPB.ahk
     }
     
     GuiControl,, StatusText, %status%
@@ -367,10 +388,12 @@ ToggleMonitor:
     if (monitorRunning) {
         ; Kill Monitor.ahk
         killAHK("Monitor.ahk")
+        GuiControl,, ToggleMonitor, Toggle Monitor.ahk
         MsgBox, 64, Monitor Status, Monitor has been turned OFF.
     } else {
         ; Launch Monitor.ahk
         Run, %A_ScriptDir%\Monitor.ahk
+        GuiControl,, ToggleMonitor, Toggle Monitor.ahk *
         MsgBox, 64, Monitor Status, Monitor has been turned ON.
     }
     
@@ -605,3 +628,80 @@ ExitApp
 CheckUpdate:
     Run, https://github.com/joshptcgp/PTCGPB-Extra
 return 
+
+; Function to calculate and display stats
+UpdateStats:
+    ; Read reroll time from settings
+    IniRead, rerollTime, Settings.ini, UserSettings, rerollTime
+    if (rerollTime = "ERROR" || rerollTime = "") {
+        GuiControl,, StatsText, No stats available yet
+        return
+    }
+
+    ; Calculate elapsed time
+    totalSeconds := Round((A_TickCount - rerollTime) / 1000)
+    minutes := Floor(totalSeconds / 60)
+    hours := Floor(minutes / 60)
+    minutes := Mod(minutes, 60)
+
+    ; Get total packs opened
+    totalPacks := SumVariablesInJsonFile()
+
+    ; Calculate packs per hour
+    packsPerHour := Round((totalPacks / totalSeconds) * 3600, 2)
+
+    ; Get configuration info
+    IniRead, deleteMethod, Settings.ini, UserSettings, deleteMethod
+    IniRead, nukeAccount, Settings.ini, UserSettings, nukeAccount
+    IniRead, packMethod, Settings.ini, UserSettings, packMethod
+
+    ; Build configuration message
+    configMsg := "Type: " . deleteMethod
+    if (packMethod)
+        configMsg .= " (1P Method)"
+    if (nukeAccount && !InStr(deleteMethod, "Inject"))
+        configMsg .= " (Menu Delete)"
+
+    ; Update stats display
+    statsText := "Time: " . hours . "h " . minutes . "m`n"
+    statsText .= "Instances: " . Instances . "`n"
+    statsText .= "Packs: " . totalPacks . "`n"
+    statsText .= "Rate: " . packsPerHour . " packs/hour`n"
+    statsText .= configMsg
+
+    GuiControl,, StatsText, %statsText%
+return
+
+RefreshStats:
+    Gosub, UpdateStats
+    Gosub, UpdateStatus
+return
+
+; Function to sum variables in JSON file (ported from PTCGPB.ahk)
+SumVariablesInJsonFile() {
+    jsonFileName := A_ScriptDir . "\json\Packs.json"
+    if (jsonFileName = "") {
+        return 0
+    }
+
+    ; Read the file content
+    FileRead, jsonContent, %jsonFileName%
+    if (jsonContent = "") {
+        return 0
+    }
+
+    ; Parse the JSON and calculate the sum
+    sum := 0
+    ; Clean and parse JSON content
+    jsonContent := StrReplace(jsonContent, "[", "") ; Remove starting bracket
+    jsonContent := StrReplace(jsonContent, "]", "") ; Remove ending bracket
+    Loop, Parse, jsonContent, {, }
+    {
+        ; Match each variable value
+        if (RegExMatch(A_LoopField, """variable"":\s*(-?\d+)", match)) {
+            sum += match1
+        }
+    }
+
+    return sum
+} 

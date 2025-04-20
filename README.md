@@ -6,7 +6,7 @@ This is an opinionated fork of [Arturo's PTCGPB](https://github.com/Arturo-1212/
 
 - ⚡ Faster friend adding process for group efficiency
 - 🎯 GP Test filter option: Only keeps God Packs with 4+ Double 2 Stars Cards
-- 🎮 Added Control panel for better management / Killing stuck instances
+- 🎮 Added Control panel for better management / Killing stuck instances / Better Statistics
 - 🔧 Improved frozen/stuck instance handling in Monitor.ahk
 - 🗑️ Removed save for trade feature (not suitable for reroll groups)
 - 🤖 Alias Generator for botting account usernames
