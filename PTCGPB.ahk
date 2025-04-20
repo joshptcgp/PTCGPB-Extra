@@ -801,7 +801,7 @@ Start:
 
 
 
-        if(heartBeat)
+        if(heartBeat && Instances > 0) {
             if((A_Index = 1 || (Mod(A_Index, (heartBeatDelay // 0.5)) = 0))) {
                 onlineAHK := ""
                 offlineAHK := ""
@@ -860,6 +860,7 @@ Start:
 
                 LogToDiscord(discMessage,, false,,, heartBeatWebhookURL)
             }
+        }
 
         ; Check for pack per hour alert if conditions are met
         if (mminutes >= 40 && webhookForPPH != "" && pphAlertThreshold > 0) {
