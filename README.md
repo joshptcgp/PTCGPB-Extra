@@ -17,6 +17,7 @@ This is an opinionated fork of [Arturo's PTCGPB](https://github.com/Arturo-1212/
 - 🗑️ Removed save for trade feature (not suitable for reroll groups)
 - 🤖 Alias Generator for botting account usernames
 - ⚠️ Low Pack Per Hours Alert via Webhook
+- 🧪 [Beta] Account generation only mode - only works for 5 pack fast method.
 
 ## **__TODO__**
 
