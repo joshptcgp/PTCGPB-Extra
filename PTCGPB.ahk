@@ -660,10 +660,10 @@ Start:
             Reload
             return
         }
-        IfMsgBox, Yes
-        {
-            MsgBox, This is a beta feature, packs count are equal to account generated, if you keep getting stuck try using 5pack fast method.
-        }
+        ; IfMsgBox, Yes
+        ; {
+        ;     MsgBox, This is a beta feature, packs count are equal to account generated, if you keep getting stuck try using 5pack fast method.
+        ; }
     }
 
     pID := checkInstance(1)
@@ -822,8 +822,14 @@ Start:
         totalSeconds := Round((A_TickCount - rerollTime) / 1000) ; Total time in seconds
         mminutes := Floor(totalSeconds / 60)
 
-        packStatus := "Time: " . mminutes . "m | Packs: " . total
-        packStatus .= " | Avg: " . Round(total / mminutes, 2) . " packs/min"
+
+        if (generateAccountsOnly) {
+            packStatus := "Time: " . mminutes . "m | Acc: " . total
+            packStatus .= " | Avg: " . Round(total / mminutes, 2) . " acc/min"
+        } else {
+            packStatus := "Time: " . mminutes . "m | Packs: " . total
+            packStatus .= " | Avg: " . Round(total / mminutes, 2) . " packs/min"
+        }
 
         ; Display pack status at the bottom of the first reroll instance
         DisplayPackStatus(packStatus, ((runMain ? Mains * scaleParam : 0) + 5), 490)

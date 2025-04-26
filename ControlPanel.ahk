@@ -2,6 +2,8 @@
 CoordMode, Mouse, Screen
 SetTitleMatchMode, 3
 
+IniRead, generateAccountsOnly, Settings.ini, UserSettings, generateAccountsOnly, 0
+
 if not A_IsAdmin
 {
     ; Relaunch script with admin rights
@@ -663,9 +665,15 @@ UpdateStats:
     ; Update stats display
     statsText := "Time: " . hours . "h " . minutes . "m`n"
     statsText .= "Instances: " . Instances . "`n"
-    statsText .= "Packs: " . totalPacks . "`n"
-    statsText .= "Rate: " . packsPerHour . " packs/hour`n"
-    statsText .= configMsg
+    if (generateAccountsOnly) {
+        statsText .= "Acc: " . totalPacks . "`n"
+        statsText .= "Rate: " . packsPerHour . " acc/hour`n"
+        statsText .= "Account Generation Mode"
+    } else {
+        statsText .= "Packs: " . totalPacks . "`n"
+        statsText .= "Rate: " . packsPerHour . " packs/hour`n"
+        statsText .= configMsg
+    }
 
     GuiControl,, StatsText, %statsText%
 return

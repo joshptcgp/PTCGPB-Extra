@@ -183,6 +183,7 @@ if(injectMethod) {
 ; Save the account if generateAccountsOnly is true
 if (generateAccountsOnly){
     nukeAccount := false
+    clearMissionCache()
 }
 
 if(!injectMethod || !loadedAccount)
@@ -240,6 +241,12 @@ if(DeadCheck = 1){
         }
         if(dateChange)
             createAccountList(scriptName)
+
+        if (generateAccountsOnly){
+            clearMissionCache()
+        }
+
+        ; Open platin mod menu to set speed
         FindImageAndClick(65, 195, 100, 215, , "Platin", 18, 109, 2000) ; click mod settings
         if(setSpeed = 3)
             FindImageAndClick(182, 170, 194, 190, , "Three", 187, 180) ; click mod settings
@@ -358,6 +365,10 @@ if(DeadCheck = 1){
             else if (deleteMethod = "13 Pack")
                 packs := 13
 
+        if(generateAccountsOnly){
+            packs := 1
+        }
+
         IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
 
         ; BallCity 2025.02.21 - Keep track of additional metrics
@@ -376,6 +387,27 @@ if(DeadCheck = 1){
         sseconds := Mod(totalSeconds, 60) ; Remaining seconds within the minute
         CreateStatusMessage("Avg: " . minutes . "m " . seconds . "s | Runs: " . rerolls, "AvgRuns", 0, 510, false, true)
         LogToFile("Packs: " . packs . " | Total time: " . mminutes . "m " . sseconds . "s | Avg: " . minutes . "m " . seconds . "s | Runs: " . rerolls)
+
+        ; For account generation mode
+        if (generateAccountsOnly) {
+            AppendToJsonFile(packs)
+            saveAccount("All")
+            adbShell.StdIn.WriteLine("am force-stop jp.pokemon.pokemontcgp")
+            waitadb()
+            clearMissionCache()
+            adbShell.StdIn.WriteLine("rm /data/data/jp.pokemon.pokemontcgp/shared_prefs/deviceAccount:.xml")
+            waitadb()
+            adbShell.StdIn.WriteLine("am start -n jp.pokemon.pokemontcgp/com.unity3d.player.UnityPlayerActivity")
+            waitadb()
+
+            if (stopToggle) {
+                CreateStatusMessage("Stopping...",,,, false)
+                ExitApp
+            }
+
+            Sleep, 5000
+            Reload
+        }
 
         if ((!injectMethod || !loadedAccount) && (!nukeAccount || keepAccount)) {
             ; Doing the following because:
@@ -1091,22 +1123,6 @@ resetWindows(){
 }
 
 restartGameInstance(reason, RL := true){
-    global generateAccountsOnly
-
-    ; Don't record failed packs if generating accounts only.
-    if (!generateAccountsOnly) {
-        AppendToJsonFile(packs)
-        saveAccount("All")
-        adbShell.StdIn.WriteLine("am force-stop jp.pokemon.pokemontcgp")
-        waitadb()
-        adbShell.StdIn.WriteLine("rm /data/data/jp.pokemon.pokemontcgp/shared_prefs/deviceAccount:.xml") ; delete account data
-        waitadb()
-        adbShell.StdIn.WriteLine("am start -n jp.pokemon.pokemontcgp/com.unity3d.player.UnityPlayerActivity")
-        waitadb()
-        LogToFile("Restarted instance " . scriptName . " | Acc Gen: " . packs . " | Reason: " reason, "Restart.txt")
-        Sleep, 5000
-        Reload
-    }
 
     if (Debug)
         CreateStatusMessage("Restarting game reason:`n" . reason)
@@ -1123,6 +1139,7 @@ restartGameInstance(reason, RL := true){
     } else {
         adbShell.StdIn.WriteLine("am force-stop jp.pokemon.pokemontcgp")
         waitadb()
+        clearMissionCache()
         if (!RL && DeadCheck = 0) {
             adbShell.StdIn.WriteLine("rm /data/data/jp.pokemon.pokemontcgp/shared_prefs/deviceAccount:.xml") ; delete account data
         }
@@ -3025,4 +3042,9 @@ HomeAndMission(homeonly := 0) {
 	}
 	}
 	return Leveled
+}
+
+clearMissionCache() {
+    adbShell.StdIn.WriteLine("rm /data/data/jp.pokemon.pokemontcgp/files/UserPreferences/v1/MissionUserPrefs")
+    waitadb()
 }
