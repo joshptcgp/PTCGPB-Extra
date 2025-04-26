@@ -191,6 +191,10 @@ if(!injectMethod || !loadedAccount)
 pToken := Gdip_Startup()
 packs := 0
 
+if(generateAccountsOnly){
+    keepAccount := true
+}
+
 ; Define default swipe params.
 adbSwipeX1 := Round(35 / 277 * 535)
 adbSwipeX2 := Round(267 / 277 * 535)
@@ -199,7 +203,12 @@ global adbSwipeParams := adbSwipeX1 . " " . adbSwipeY . " " . adbSwipeX2 . " " .
 
 if(DeadCheck = 1){
     friended:= true
-    menuDeleteStart()
+    if(generateAccountsOnly){
+        adbShell.StdIn.WriteLine("rm /data/data/jp.pokemon.pokemontcgp/shared_prefs/deviceAccount:.xml")
+        waitadb()
+    } else {
+        menuDeleteStart()
+    }
     IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
     Reload
 }else{
